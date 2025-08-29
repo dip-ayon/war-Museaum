@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liberation War Museum Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-landmark fa-2x" style="color: var(--gold);"></i>
+                    <h1>Liberation War Museum</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Exhibits</a></li>
+                        <li><a href="#">Collections</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <button class="btn btn-outline" onclick="openLoginModal()">Login</button>
+                    <button class="btn btn-primary" onclick="openRegisterModal()">Register</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+  <!-- Slideshow -->
+  <div class="slideshow">
+    <div class="slides fade">
+      <img src="/public/assets/images/img1.jpg" alt="Artifact 1">
+      <div class="hero-text">
+        <h2>Preserving Our History</h2>
+        <p>Explore the artifacts and stories from the Liberation War of Bangladesh</p>
+        <button class="btn btn-primary" onclick="openExploreModal()">Explore Exhibits</button>
+      </div>
+    </div>
+
+    <div class="slides fade">
+      <img src="/public/assets/images/img2.jpg" alt="Artifact 2">
+      <div class="hero-text">
+        <h2>Voices of Freedom</h2>
+        <p>Discover personal stories that shaped our nation</p>
+        <button class="btn btn-primary" onclick="openExploreModal()">Learn More</button>
+      </div>
+    </div>
+    <div class="slides fade">
+        <img src="/public/assets/images/img3.jpg" alt="Artifact 2">
+        <div class="hero-text">
+          <h2>Voices of Freedom</h2>
+          <p>Discover personal stories that shaped our nation</p>
+          <button class="btn btn-primary" onclick="openExploreModal()">Learn More</button>
+        </div>
+      </div>
+      <div class="slides fade">
+        <img src="/public/assets/images/img4.jpg" alt="Artifact 2">
+        <div class="hero-text">
+          <h2>Voices of Freedom</h2>
+          <p>Discover personal stories that shaped our nation</p>
+          <button class="btn btn-primary" onclick="openExploreModal()">Learn More</button>
+        </div>
+      </div>
+      <div class="slides fade">
+        <img src="/public/assets/images/img5.jpg" alt="Artifact 2">
+        <div class="hero-text">
+          <h2>Voices of Freedom</h2>
+          <p>Discover personal stories that shaped our nation</p>
+          <button class="btn btn-primary" onclick="openExploreModal()">Learn More</button>
+        </div>
+      </div>
+
+    <!-- Buttons -->
+    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+    <a class="next" onclick="plusSlides(1)">&#10095;</a>
+  </div>
+</section>
+
+    <!-- Search Section -->
+    <section class="search-section">
+        <div class="container">
+            <div class="search-box">
+                <select class="search-dropdown" aria-label="Search by">
+                    <option value="collectionNo">Collection No.</option>
+                    <option value="accessionNo">Accession No</option>
+                    <option value="donor">Donor</option>
+                    <option value="objectType">Object Type</option>
+                    <option value="objectHead">Object Head</option>
+                </select>
+                <input type="text" class="search-input" placeholder="Enter search term...">
+                <button class="btn btn-primary search-btn"><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="search-results">
+                <p>Search Results: <span id="resultCount">0</span> artifacts found</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Artifacts Section -->
+    <section class="artifacts-section">
+        <div class="container">
+            <h2 class="section-title">Featured Artifacts</h2>
+            <div class="artifacts-grid" id="artifactsGrid">
+                <!-- Artifacts will be loaded here dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Liberation War Museum</h3>
+                    <p>Preserving the memory of each new source and the journey to freedom</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Exhibits</a></li>
+                        <li><a href="#">Collections</a></li>
+                        <li><a href="#">About Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 5 Segun Bagicha, Dhaka 1000</p>
+                    <p><i class="fas fa-phone"></i> +880 XXXX-XXXXXX</p>
+                    <p><i class="fas fa-envelope"></i> info@liberationwarmuseum.org</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Copyright &copy; Liberation War Museum</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeLoginModal()">&times;</span>
+            <h2>Login to Your Account</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            <p style="margin-top: 1rem;">Don't have an account? <a href="#" onclick="openRegisterModal()">Register here</a></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeRegisterModal()">&times;</span>
+            <h2>Create New Account</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email Address</label>
+                    <input type="email" id="registerEmail" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Confirm Password</label>
+                    <input type="password" id="registerConfirmPassword" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="container">
+        <div id="adminPanel" class="admin-panel">
+            <div class="admin-header">
+                <h2>Admin Panel</h2>
+                <button class="btn btn-primary" onclick="logout()">Logout</button>
+            </div>
+            
+            <div class="admin-nav">
+                <button class="admin-nav-btn active" onclick="showAdminSection('artifactManagement')">Artifact Management</button>
+                <button class="admin-nav-btn" onclick="showAdminSection('userManagement')">User Management</button>
+                <button class="admin-nav-btn" onclick="showAdminSection('reportGeneration')">Report Generation</button>
+            </div>
+            
+            <div id="artifactManagement" class="admin-section active">
+                <h3>All Artifacts</h3>
+                <button class="btn btn-primary" onclick="openUploadModal()">Upload Artifact</button>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Collection No.</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminArtifactsTable">
+                        <!-- Artifacts will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="userManagement" class="admin-section">
+                <h3>User Management</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Join Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Admin User</td>
+                            <td>admin@museum.org</td>
+                            <td>Administrator</td>
+                            <td>2023-01-15</td>
+                            <td>
+                                <button class="btn btn-primary">Edit</button>
+                                <button class="btn btn-outline">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="reportGeneration" class="admin-section">
+                <h3>Report Generation</h3>
+                <div class="form-group">
+                    <label for="sortBy">Sort By:</label>
+                    <select class="form-control" id="sortBy">
+                        <option>Collection No.</option>
+                        <option>Collection Date</option>
+                        <option>Object Type</option>
+                        <option>Object Head</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary">Generate Report</button>
+                <button class="btn btn-outline">Download Excel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Artifact Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeUploadModal()">&times;</span>
+            <h2>Upload New Artifact</h2>
+            <form id="uploadForm">
+                <div class="artifact-form">
+                    <div class="form-group">
+                        <label for="collectionNumber">Collection Number</label>
+                        <input type="text" id="collectionNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="accessionNumber">Accession Number</label>
+                        <input type="text" id="accessionNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="collectionDate">Collection Date</label>
+                        <input type="date" id="collectionDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contributorName">Contributor Name</label>
+                        <input type="text" id="contributorName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="objectType">Object Type</label>
+                        <input type="text" id="objectType" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="objectHead">Object Head</label>
+                        <input type="text" id="objectHead" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="measurement">Measurement</label>
+                        <input type="text" id="measurement" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="artifactImage">Artifact Image (Max 5 images)</label>
+                        <input type="file" id="artifactImage" class="form-control" multiple accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="galleryNumber">Gallery Number</label>
+                        <input type="text" id="galleryNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="foundPlace">Found Place Information</label>
+                        <input type="text" id="foundPlace" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="experimentFormula">Experiment Formula</label>
+                        <input type="text" id="experimentFormula" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="significance">Significance Comment</label>
+                        <textarea id="significance" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="correction">Correction</label>
+                        <input type="text" id="correction" class="form-control">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload Artifact</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample artifact data
+        const artifacts = [
+            {
+                id: 1,
+                collectionNo: "LWM-2023-001",
+                accessionNo: "ACC-001",
+                name: "Historical Document",
+                type: "Document",
+                date: "1971-03-26",
+                description: "An important historical document from the liberation war period.",
+                image: "https://images.unsplash.com/photo-1589652717521-10c0d092dea9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+            },
+            {
+                id: 2,
+                collectionNo: "LWM-2023-002",
+                accessionNo: "ACC-002",
+                name: "Vintage Photograph",
+                type: "Photograph",
+                date: "1971-12-16",
+                description: "A photograph capturing a significant moment during the liberation war.",
+                image: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80"
+            },
+            {
+                id: 3,
+                collectionNo: "LWM-2023-003",
+                accessionNo: "ACC-003",
+                name: "Military Artifact",
+                type: "Weapon",
+                date: "1971-07-01",
+                description: "A weapon used by freedom fighters during the liberation war.",
+                image: "https://images.unsplash.com/photo-1585496382155-2d1726e83c75?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+            },
+            {
+                id: 4,
+                collectionNo: "LWM-2023-004",
+                accessionNo: "ACC-004",
+                name: "Personal Diary",
+                type: "Document",
+                date: "1971-05-14",
+                description: "A freedom fighter's personal diary documenting daily experiences.",
+                image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2028&q=80"
+            },
+            {
+                id: 5,
+                collectionNo: "LWM-2023-005",
+                accessionNo: "ACC-005",
+                name: "Medal of Honor",
+                type: "Memorabilia",
+                date: "1971-12-16",
+                description: "A medal awarded to freedom fighters for their bravery.",
+                image: "https://images.unsplash.com/photo-1571835782488-179303a6e7ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+            },
+            {
+                id: 6,
+                collectionNo: "LWM-2023-006",
+                accessionNo: "ACC-006",
+                name: "War-time Newspaper",
+                type: "Document",
+                date: "1971-04-10",
+                description: "A newspaper from during the liberation war with important announcements.",
+                image: "https://images.unsplash.com/photo-1558901357-ca41e027e43a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2075&q=80"
+            }
+        ];
+
+        // DOM Elements
+        const artifactsGrid = document.getElementById('artifactsGrid');
+        const adminPanel = document.getElementById('adminPanel');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const uploadModal = document.getElementById('uploadModal');
+        const resultCount = document.getElementById('resultCount');
+        const adminArtifactsTable = document.getElementById('adminArtifactsTable');
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadArtifacts();
+            checkAuthStatus();
+        });
+
+        // Load artifacts to the page
+        function loadArtifacts() {
+            artifactsGrid.innerHTML = '';
+            artifacts.forEach(artifact => {
+                const artifactCard = document.createElement('div');
+                artifactCard.className = 'artifact-card';
+                artifactCard.innerHTML = `
+                    <div class="artifact-img">
+                        <img src="${artifact.image}" alt="${artifact.name}">
+                    </div>
+                    <div class="artifact-info">
+                        <h3>${artifact.name}</h3>
+                        <div class="artifact-meta">
+                            <p><strong>Collection No:</strong> ${artifact.collectionNo}</p>
+                            <p><strong>Type:</strong> ${artifact.type}</p>
+                            <p><strong>Date:</strong> ${artifact.date}</p>
+                        </div>
+                        <p>${artifact.description}</p>
+                    </div>
+                `;
+                artifactsGrid.appendChild(artifactCard);
+            });
+            resultCount.textContent = artifacts.length;
+        }
+
+        // Modal functions
+        function openLoginModal() {
+            loginModal.style.display = 'block';
+        }
+
+        function closeLoginModal() {
+            loginModal.style.display = 'none';
+        }
+
+        function openRegisterModal() {
+            registerModal.style.display = 'block';
+            closeLoginModal();
+        }
+
+        function closeRegisterModal() {
+            registerModal.style.display = 'none';
+        }
+
+        function openUploadModal() {
+            uploadModal.style.display = 'block';
+        }
+
+        function closeUploadModal() {
+            uploadModal.style.display = 'none';
+        }
+
+        // Admin panel functions
+        function showAdminSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show the selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update active button
+            document.querySelectorAll('.admin-nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Check if user is authenticated (for demo purposes)
+        function checkAuthStatus() {
+            // This would normally check with a backend
+            const isAuthenticated = localStorage.getItem('authenticated') === 'true';
+            const isAdmin = localStorage.getItem('userRole') === 'admin';
+            
+            if (isAuthenticated && isAdmin) {
+                adminPanel.style.display = 'block';
+                document.querySelector('.auth-buttons').innerHTML = `
+                    <button class="btn btn-primary" onclick="logout()">Logout</button>
+                `;
+                loadAdminArtifacts();
+            }
+        }
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Simple authentication (in a real app, this would connect to a backend)
+            if (email === 'admin@museum.org' && password === 'admin123') {
+                localStorage.setItem('authenticated', 'true');
+                localStorage.setItem('userRole', 'admin');
+                closeLoginModal();
+                checkAuthStatus();
+                alert('Login successful! Admin panel activated.');
+            } else {
+                alert('Invalid credentials. Try admin@museum.org / admin123');
+            }
+        });
+
+        // Register form submission
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Registration functionality would connect to a backend in a real application.');
+            closeRegisterModal();
+        });
+
+        // Upload form submission
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Artifact upload functionality would connect to a backend in a real application.');
+            closeUploadModal();
+        });
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authenticated');
+            localStorage.removeItem('userRole');
+            adminPanel.style.display = 'none';
+            document.querySelector('.auth-buttons').innerHTML = `
+                <button class="btn btn-outline" onclick="openLoginModal()">Login</button>
+                <button class="btn btn-primary" onclick="openRegisterModal()">Register</button>
+            `;
+            alert('Logged out successfully.');
+        }
+
+        // Load artifacts for admin table
+        function loadAdminArtifacts() {
+            adminArtifactsTable.innerHTML = '';
+            artifacts.forEach(artifact => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${artifact.collectionNo}</td>
+                    <td>${artifact.name}</td>
+                    <td>${artifact.type}</td>
+                    <td>${artifact.date}</td>
+                    <td>
+                        <button class="btn btn-primary">Edit</button>
+                        <button class="btn btn-outline">Delete</button>
+                    </td>
+                `;
+                adminArtifactsTable.appendChild(row);
+            });
+        }
+
+        // Close modals if clicked outside
+        window.onclick = function(event) {
+            if (event.target === loginModal) {
+                closeLoginModal();
+            }
+            if (event.target === registerModal) {
+                closeRegisterModal();
+            }
+            if (event.target === uploadModal) {
+                closeUploadModal();
+            }
+        }
+
+        let slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function showSlides(n) {
+  let i;
+  let slides = document.getElementsByClassName("slides");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = "none";  
+  }
+  slides[slideIndex-1].style.display = "block";  
+}
+    </script>
+</body>
+</html>
