@@ -2,12 +2,13 @@
 let currentUser = null;
 let currentSlideIndex = 0;
 let slideshowInterval;
+let slideshowImages = []; // To store images fetched from DB
 
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
     setupEventListeners();
-    startSlideshow();
+    loadSlideshowImages(); // Load slideshow images first
     loadArtifacts();
 });
 
@@ -27,13 +28,17 @@ function initializeApp() {
     }
 
     // Initialize AOS (Animate On Scroll)
-    if (typeof AOS !== 'undefined') {
+    // Ensure AOS is loaded before initializing
+    if (window.AOS) {
         AOS.init({
             duration: 1000,
             easing: 'ease-in-out',
             once: true,
             mirror: false
         });
+    } else {
+        // Fallback if AOS is not loaded, or handle it differently
+        console.warn("AOS library not found. Animations may not work.");
     }
 }
 
@@ -95,29 +100,88 @@ function setupEventListeners() {
 }
 
 // Slideshow functionality
+async function loadSlideshowImages() {
+    try {
+        const response = await fetch('php/api.php?action=get_slideshow_images');
+        slideshowImages = await response.json();
+        renderSlideshow();
+        startSlideshow();
+    } catch (error) {
+        console.error('Failed to load slideshow images:', error);
+    }
+}
+
+function renderSlideshow() {
+    const slideshowContainer = document.querySelector('.slideshow');
+    const slideIndicatorsContainer = document.querySelector('.slide-indicators');
+
+    if (!slideshowContainer || !slideIndicatorsContainer || slideshowImages.length === 0) return;
+
+    // Clear existing slides and indicators
+    slideshowContainer.querySelectorAll('.slides').forEach(slide => slide.remove());
+    slideIndicatorsContainer.innerHTML = '';
+
+    slideshowImages.forEach((image, index) => {
+        const slideDiv = document.createElement('div');
+        slideDiv.classList.add('slides', 'fade');
+        if (index === 0) slideDiv.classList.add('active');
+        slideDiv.setAttribute('data-aos', 'zoom-in');
+
+        slideDiv.innerHTML = `
+            <img src="assets/images/${image.image_path}" alt="${image.caption}">
+            <div class="hero-overlay"></div>
+            <div class="hero-text" data-aos="fade-up" data-aos-delay="300">
+                <div class="hero-badge">
+                    <i class="fas fa-star"></i>
+                    <span>Digital Archive</span>
+                </div>
+                <h2 class="hero-title">${image.caption}</h2>
+                <p class="hero-subtitle">Explore the artifacts and stories from the Liberation War of Bangladesh</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary btn-hero" onclick="openExploreModal()">
+                        <i class="fas fa-search"></i>
+                        Explore Exhibits
+                    </button>
+                    <button class="btn btn-outline btn-hero" onclick="scrollToSection('about')">
+                        <i class="fas fa-info-circle"></i>
+                        Learn More
+                    </button>
+                </div>
+            </div>
+        `;
+        slideshowContainer.insertBefore(slideDiv, slideshowContainer.querySelector('.slideshow-nav.prev'));
+
+        const indicatorSpan = document.createElement('span');
+        indicatorSpan.classList.add('indicator');
+        if (index === 0) indicatorSpan.classList.add('active');
+        indicatorSpan.setAttribute('onclick', `currentSlide(${index + 1})`);
+        slideIndicatorsContainer.appendChild(indicatorSpan);
+    });
+}
+
 function startSlideshow() {
     const slides = document.querySelectorAll('.slides');
     const indicators = document.querySelectorAll('.indicator');
-
+    
     if (slides.length === 0) return;
-
+    
     function showSlide(index) {
         slides.forEach(slide => slide.classList.remove('active'));
         indicators.forEach(indicator => indicator.classList.remove('active'));
-
+        
         slides[index].classList.add('active');
         indicators[index].classList.add('active');
         currentSlideIndex = index;
     }
-
+    
     function nextSlide() {
         currentSlideIndex = (currentSlideIndex + 1) % slides.length;
         showSlide(currentSlideIndex);
     }
-
+    
     // Auto-advance slides
     slideshowInterval = setInterval(nextSlide, 5000);
-
+    
     // Pause on hover
     const slideshow = document.querySelector('.slideshow');
     if (slideshow) {
@@ -132,17 +196,17 @@ function startSlideshow() {
 window.plusSlides = function(n) {
     const slides = document.querySelectorAll('.slides');
     const indicators = document.querySelectorAll('.indicator');
-
+    
     if (slides.length === 0) return;
-
+    
     currentSlideIndex = (currentSlideIndex + n + slides.length) % slides.length;
-
+    
     slides.forEach(slide => slide.classList.remove('active'));
     indicators.forEach(indicator => indicator.classList.remove('active'));
-
+    
     slides[currentSlideIndex].classList.add('active');
     indicators[currentSlideIndex].classList.add('active');
-
+    
     // Reset interval
     clearInterval(slideshowInterval);
     slideshowInterval = setInterval(() => {
@@ -157,17 +221,17 @@ window.plusSlides = function(n) {
 window.currentSlide = function(n) {
     const slides = document.querySelectorAll('.slides');
     const indicators = document.querySelectorAll('.indicator');
-
+    
     if (slides.length === 0) return;
-
+    
     currentSlideIndex = n - 1;
-
+    
     slides.forEach(slide => slide.classList.remove('active'));
     indicators.forEach(indicator => indicator.classList.remove('active'));
-
+    
     slides[currentSlideIndex].classList.add('active');
     indicators[currentSlideIndex].classList.add('active');
-
+    
     // Reset interval
     clearInterval(slideshowInterval);
     slideshowInterval = setInterval(() => {
@@ -205,10 +269,11 @@ async function registerUser(userData) {
 
         if (data.success) {
             showNotification('Registration successful! Please login.', 'success');
+            addLog('User Registered', `User with email ${userData.email} has registered.`);
             closeRegisterModal();
             openLoginModal();
         } else {
-            showNotification(data.error || 'Registration failed', 'error');
+            showNotification(data.message || 'Registration failed', 'error');
         }
     } catch (error) {
         showNotification('Network error. Please try again.', 'error');
@@ -235,15 +300,24 @@ async function loginUser(credentials) {
             updateAuthButtons();
             closeLoginModal();
             showNotification(`Welcome back, ${data.user.name}!`, 'success');
+            addLog('User Login', `User ${data.user.name} logged in.`);
 
-            // Redirect to admin panel if admin
+            // Redirect based on user role
             if (data.user.role === 'admin') {
                 setTimeout(() => {
                     window.location.href = 'admin.html';
                 }, 1000);
+            } else if (data.user.role === 'visitor') { // Assuming 'visitor' role for regular users
+                setTimeout(() => {
+                    window.location.href = 'visitor_dashboard.html';
+                }, 1000);
+            } else { // Default to visitor dashboard for any other non-admin role
+                setTimeout(() => {
+                    window.location.href = 'visitor_dashboard.html';
+                }, 1000);
             }
         } else {
-            showNotification(data.error || 'Login failed', 'error');
+            showNotification(data.message || 'Login failed', 'error');
         }
     } catch (error) {
         showNotification('Network error. Please try again.', 'error');
@@ -251,6 +325,7 @@ async function loginUser(credentials) {
 }
 
 function logout() {
+    addLog('User Logout', `User ${currentUser.name} logged out.`);
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
     currentUser = null;
@@ -351,12 +426,13 @@ async function searchArtifactsFromSlideshow() {
 
     try {
         const response = await fetch(`php/api.php?action=search_artifacts&type=${searchType}&value=${encodeURIComponent(searchValue)}`);
-        const artifacts = await response.json();
+        const data = await response.json();
 
-        displayArtifacts(artifacts);
-        updateResultCount(artifacts.length);
+        displayArtifacts(data.artifacts);
+        updateResultCount(data.artifacts.length);
+        addLog('Search Artifacts', `Visitor searched for "${searchValue}"`);
 
-        if (artifacts.length === 0) {
+        if (data.artifacts.length === 0) {
             showNotification('No artifacts found matching your search', 'info');
         } else {
             // Scroll to exhibits section
@@ -371,19 +447,20 @@ function filterArtifacts(filter) {
     // This would typically make an API call with filter parameters
     // For now, we'll just show a notification
     showNotification(`Filtering by: ${filter}`, 'info');
+    addLog('Filter Artifacts', `Visitor filtered by "${filter}"`);
     loadArtifacts(filter);
 }
 
 async function loadArtifacts(filter = 'all') {
     try {
-        let url = 'php/api.php?action=get_artifacts';
+        let url = 'php/api.php?action=get_top_visited_artifacts'; // Default to top visited
         if (filter !== 'all') {
             url = `php/api.php?action=search_artifacts&type=object_type&value=${filter}`;
         }
         const response = await fetch(url);
-        const artifacts = await response.json();
+        const data = await response.json();
 
-        displayArtifacts(artifacts);
+        displayArtifacts(data.artifacts);
     } catch (error) {
         console.error('Failed to load artifacts:', error);
     }
@@ -442,9 +519,8 @@ function updateResultCount(count) {
 
 async function viewArtifact(id) {
     try {
-        const response = await fetch(`php/api.php?action=get_artifacts`);
-        const artifacts = await response.json();
-        const artifact = artifacts.find(a => a.id == id);
+        const response = await fetch(`php/api.php?action=get_artifact_by_id&id=${id}`);
+        const artifact = await response.json();
 
         if (artifact) {
             const modal = document.getElementById('artifactModal');
@@ -476,6 +552,7 @@ async function viewArtifact(id) {
                 </div>
             `;
             modal.style.display = 'block';
+            addLog('View Artifact', `Visitor viewed artifact with ID ${id}`);
         }
     } catch (error) {
         console.error('Failed to load artifact details:', error);
@@ -558,14 +635,42 @@ document.addEventListener('submit', function(e) {
     if (e.target.id === 'registerForm') {
         e.preventDefault();
         const formData = new FormData(e.target);
+        const password = formData.get('password');
+        const confirmPassword = formData.get('confirmPassword');
+
+        if (password !== confirmPassword) {
+            showNotification('Passwords do not match', 'error');
+            return;
+        }
+
         const userData = {
             name: formData.get('name'),
             email: formData.get('email'),
-            password: formData.get('password')
+            password: password
         };
         registerUser(userData);
     }
 });
+
+function addLog(action, details) {
+    const userId = currentUser ? currentUser.id : null;
+    fetch('php/admin_api.php?action=add_log', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ user_id: userId, action: action, details: details })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            console.error('Failed to add log');
+        }
+    })
+    .catch(error => {
+        console.error('Error adding log:', error);
+    });
+}
 
 // Export functions for global access
 window.openLoginModal = openLoginModal;

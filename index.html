@@ -58,104 +58,7 @@
     <section class="hero" id="home">
         <div class="hero-bg-pattern"></div>
         <div class="slideshow">
-            <div class="slides fade active" data-aos="zoom-in">
-                <img src="/assets/images/img1.jpg" alt="Liberation War Artifacts">
-                <div class="hero-overlay"></div>
-                <div class="hero-text" data-aos="fade-up" data-aos-delay="300">
-                    <div class="hero-badge">
-                        <i class="fas fa-star"></i>
-                        <span>Digital Archive</span>
-                    </div>
-                    <h2 class="hero-title">Preserving Our History</h2>
-                    <p class="hero-subtitle">Explore the artifacts and stories from the Liberation War of Bangladesh</p>
-                    <div class="hero-buttons">
-                        <button class="btn btn-primary btn-hero" onclick="openExploreModal()">
-                            <i class="fas fa-search"></i>
-                            Explore Exhibits
-                        </button>
-                        <button class="btn btn-outline btn-hero" onclick="scrollToSection('about')">
-                            <i class="fas fa-info-circle"></i>
-                            Learn More
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="slides fade">
-                <img src="/assets/images/img2.jpg" alt="Historical Documents">
-                <div class="hero-overlay"></div>
-                <div class="hero-text">
-                    <div class="hero-badge">
-                        <i class="fas fa-scroll"></i>
-                        <span>Historical Documents</span>
-                    </div>
-                    <h2 class="hero-title">Voices of Freedom</h2>
-                    <p class="hero-subtitle">Discover personal stories that shaped our nation's destiny</p>
-                    <div class="hero-buttons">
-                        <button class="btn btn-primary btn-hero" onclick="openExploreModal()">
-                            <i class="fas fa-book-open"></i>
-                            Read Stories
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="slides fade">
-                <img src="/assets/images/img3.jpg" alt="War Artifacts">
-                <div class="hero-overlay"></div>
-                <div class="hero-text">
-                    <div class="hero-badge">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>War Artifacts</span>
-                    </div>
-                    <h2 class="hero-title">Legacy of Courage</h2>
-                    <p class="hero-subtitle">Witness the tools and weapons that fought for our independence</p>
-                    <div class="hero-buttons">
-                        <button class="btn btn-primary btn-hero" onclick="openExploreModal()">
-                            <i class="fas fa-eye"></i>
-                            View Collection
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="slides fade">
-                <img src="/assets/images/img4.jpg" alt="Personal Stories">
-                <div class="hero-overlay"></div>
-                <div class="hero-text">
-                    <div class="hero-badge">
-                        <i class="fas fa-users"></i>
-                        <span>Personal Stories</span>
-                    </div>
-                    <h2 class="hero-title">Heroes Among Us</h2>
-                    <p class="hero-subtitle">Meet the brave individuals who made our freedom possible</p>
-                    <div class="hero-buttons">
-                        <button class="btn btn-primary btn-hero" onclick="openExploreModal()">
-                            <i class="fas fa-heart"></i>
-                            Meet Heroes
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="slides fade">
-                <img src="/assets/images/img5.jpg" alt="Cultural Heritage">
-                <div class="hero-overlay"></div>
-                <div class="hero-text">
-                    <div class="hero-badge">
-                        <i class="fas fa-crown"></i>
-                        <span>Cultural Heritage</span>
-                    </div>
-                    <h2 class="hero-title">Our Cultural Heritage</h2>
-                    <p class="hero-subtitle">Preserving the rich cultural legacy of our liberation struggle</p>
-                    <div class="hero-buttons">
-                        <button class="btn btn-primary btn-hero" onclick="openExploreModal()">
-                            <i class="fas fa-gem"></i>
-                            Explore Heritage
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <!-- Slides will be loaded here dynamically by JavaScript -->
 
             <!-- Navigation Buttons -->
             <button class="slideshow-nav prev" onclick="plusSlides(-1)" aria-label="Previous slide">
@@ -167,11 +70,7 @@
 
             <!-- Slide Indicators -->
             <div class="slide-indicators">
-                <span class="indicator active" onclick="currentSlide(1)"></span>
-                <span class="indicator" onclick="currentSlide(2)"></span>
-                <span class="indicator" onclick="currentSlide(3)"></span>
-                <span class="indicator" onclick="currentSlide(4)"></span>
-                <span class="indicator" onclick="currentSlide(5)"></span>
+                <!-- Indicators will be loaded here dynamically by JavaScript -->
             </div>
             
             <!-- Search Overlay -->
@@ -179,7 +78,6 @@
         </div>
     </section>
 
-    <!-- Exhibits Section -->
     <!-- Exhibits Section -->
 <section class="exhibits-section" id="exhibits">
     <div class="container">
@@ -228,7 +126,7 @@
                     </button>
                 </div>
             </div>  
-        </div
+        </div>
         
         
 
@@ -245,6 +143,9 @@
             <h2 class="section-title">Featured Artifacts</h2>
             <div class="artifacts-grid" id="artifactsGrid">
                 <!-- Artifacts will be loaded here dynamically -->
+            </div>
+            <div id="pagination-container" class="pagination-container">
+                <!-- Pagination will be loaded here by JavaScript -->
             </div>
         </div>
     </section>

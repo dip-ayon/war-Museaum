@@ -40,9 +40,121 @@ switch ($action) {
     case 'deleteUser':
         deleteUser($conn);
         break;
-    default:
-        echo json_encode(['error' => 'Invalid action']);
+    case 'register':
+        registerUser($conn);
         break;
+    case 'login':
+        loginUser($conn);
+        break;
+    case 'add_log':
+        add_log($conn);
+        break;
+    default:
+        echo json_encode(['success' => false, 'message' => 'Invalid action']);
+        break;
+}
+
+function registerUser($conn) {
+    error_log("Register function called.");
+    $data = json_decode(file_get_contents("php://input"), true);
+    error_log("Received data for register: " . print_r($data, true));
+    $name = $data['name'] ?? '';
+    $email = $data['email'] ?? '';
+    $password = $data['password'] ?? '';
+
+    if (empty($name) || empty($email) || empty($password)) {
+        error_log("Register: Missing required fields.");
+        echo json_encode(['success' => false, 'message' => 'Please fill all required fields.']);
+        return;
+    }
+
+    // Check if user already exists
+    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    if ($stmt === false) {
+        error_log("Register: Prepare statement failed: " . $conn->error);
+        echo json_encode(['success' => false, 'message' => 'Database error.']);
+        return;
+    }
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows > 0) {
+        error_log("Register: User with this email already exists.");
+        echo json_encode(['success' => false, 'message' => 'User with this email already exists.']);
+        $stmt->close();
+        return;
+    }
+    $stmt->close();
+
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+    if ($stmt === false) {
+        error_log("Register: Prepare statement failed for insert: " . $conn->error);
+        echo json_encode(['success' => false, 'message' => 'Database error.']);
+        return;
+    }
+    $stmt->bind_param("sss", $name, $email, $hashed_password);
+
+    if ($stmt->execute()) {
+        error_log("Register: User registered successfully.");
+        echo json_encode(['success' => true, 'message' => 'Registration successful.']);
+    } else {
+        error_log("Register: Registration failed: " . $stmt->error);
+        echo json_encode(['success' => false, 'message' => 'Registration failed.']);
+    }
+    $stmt->close();
+}
+
+function loginUser($conn) {
+    error_log("Login function called.");
+    $data = json_decode(file_get_contents("php://input"), true);
+    error_log("Received data for login: " . print_r($data, true));
+    $email = $data['email'] ?? '';
+    $password = $data['password'] ?? '';
+
+    if (empty($email) || empty($password)) {
+        error_log("Login: Missing email or password.");
+        echo json_encode(['success' => false, 'message' => 'Please enter email and password.']);
+        return;
+    }
+
+    $stmt = $conn->prepare("SELECT id, name, email, password, role FROM users WHERE email = ?");
+    if ($stmt === false) {
+        error_log("Login: Prepare statement failed: " . $conn->error);
+        echo json_encode(['success' => false, 'message' => 'Database error.']);
+        return;
+    }
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+        if (password_verify($password, $user['password'])) {
+            error_log("Login: Password verified. User: " . $user['email']);
+            $token = bin2hex(random_bytes(16));
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Login successful.',
+                'token' => $token,
+                'user' => [
+                    'id' => $user['id'],
+                    'name' => $user['name'],
+                    'email' => $user['email'],
+                    'role' => $user['role']
+                ]
+            ]);
+        } else {
+            error_log("Login: Invalid password for user: " . $email);
+            echo json_encode(['success' => false, 'message' => 'Invalid credentials.']);
+        }
+    } else {
+        error_log("Login: User not found: " . $email);
+        echo json_encode(['success' => false, 'message' => 'Invalid credentials.']);
+    }
+    $stmt->close();
 }
 
 function addArtifact($conn) {
@@ -226,16 +338,18 @@ function getUsers($conn) {
 }
 
 function getSystemLogs($conn) {
-    $sql = "SELECT * FROM system_logs";
+    $sql = "SELECT sl.id, u.name as user_name, sl.action, sl.details, sl.created_at FROM system_logs sl LEFT JOIN users u ON sl.user_id = u.id ORDER BY sl.created_at DESC";
     $result = $conn->query($sql);
 
     $logs = [];
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
             $logs[] = $row;
         }
+        echo json_encode($logs);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to fetch logs']);
     }
-    echo json_encode($logs);
 }
 
 function getArtifact($conn) {
@@ -249,7 +363,7 @@ function getArtifact($conn) {
     if ($result->num_rows > 0) {
         echo json_encode($result->fetch_assoc());
     } else {
-        echo json_encode(['error' => 'Artifact not found']);
+        echo json_encode(['success' => false, 'message' => 'Artifact not found']);
     }
     $stmt->close();
 }
@@ -265,7 +379,7 @@ function getUser($conn) {
     if ($result->num_rows > 0) {
         echo json_encode($result->fetch_assoc());
     } else {
-        echo json_encode(['error' => 'User not found']);
+        echo json_encode(['success' => false, 'message' => 'User not found']);
     }
     $stmt->close();
 }
@@ -377,7 +491,7 @@ function deleteArtifact($conn) {
             $conn->commit(); // Commit the transaction
             echo json_encode(['success' => true, 'message' => 'Artifact and associated images deleted successfully.']);
         } else {
-            $conn_rollback(); 
+            $conn->rollback(); 
 
             echo json_encode(['success' => false, 'message' => 'Failed to delete artifact: ' . $stmt_delete_artifact->error]);
         }
@@ -397,6 +511,12 @@ function updateUser($conn) {
 
     if (empty($id) || empty($name) || empty($email) || empty($role)) {
         echo json_encode(['success' => false, 'message' => 'Required fields are missing.']);
+        return;
+    }
+
+    $allowed_roles = ['user', 'admin'];
+    if (!in_array($role, $allowed_roles)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid role.']);
         return;
     }
 
@@ -444,6 +564,26 @@ function deleteUser($conn) {
         echo json_encode(['success' => false, 'message' => 'Failed to delete user: ' . $stmt->error]);
     }
     $stmt->close();
+}
+
+function add_log($conn) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $user_id = isset($data['user_id']) ? $data['user_id'] : null;
+    $log_action = isset($data['action']) ? $data['action'] : null;
+    $details = isset($data['details']) ? $data['details'] : null;
+
+    if ($log_action) {
+        $stmt = $conn->prepare("INSERT INTO system_logs (user_id, action, details) VALUES (?, ?, ?)");
+        $stmt->bind_param("iss", $user_id, $log_action, $details);
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to add log']);
+        }
+        $stmt->close();
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Action is required']);
+    }
 }
 
 $conn->close();

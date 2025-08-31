@@ -63,6 +63,16 @@ function closeEditUserModal() {
     document.getElementById('editUserModal').style.display = 'none';
 }
 
+function openGenericInfoModal(title, message) {
+    document.getElementById('genericInfoModalTitle').textContent = title;
+    document.getElementById('genericInfoModalMessage').textContent = message;
+    document.getElementById('genericInfoModal').style.display = 'block';
+}
+
+function closeGenericInfoModal() {
+    document.getElementById('genericInfoModal').style.display = 'none';
+}
+
 // Form Submission for Artifact Upload
 document.getElementById('uploadForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -72,7 +82,7 @@ document.getElementById('uploadForm').addEventListener('submit', function(e) {
     // Client-side validation for image count
     const imageInput = document.getElementById('artifactImages');
     if (imageInput.files.length > 5) {
-        alert('You can upload a maximum of 5 images.');
+        openGenericInfoModal('Error', 'You can upload a maximum of 5 images.');
         return; // Stop the form submission
     }
 
@@ -83,16 +93,17 @@ document.getElementById('uploadForm').addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         if(data.success) {
-            alert("Artifact uploaded successfully!");
+            openGenericInfoModal('Success', 'Artifact uploaded successfully!');
+            addLog('Artifact Added', `Artifact with collection number ${formData.get('collection_no')} was added.`);
             closeUploadModal();
             loadArtifacts();
         } else {
-            alert("Error: " + data.message);
+            openGenericInfoModal('Error', data.message);
         }
     })
     .catch(error => {
         console.error('Error uploading artifact:', error);
-        alert('An error occurred while uploading the artifact.');
+        openGenericInfoModal('Error', 'An error occurred while uploading the artifact.');
     });
 });
 
@@ -109,16 +120,17 @@ document.getElementById('userForm').addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         if(data.success) {
-            alert("User added successfully!");
+            openGenericInfoModal('Success', 'User added successfully!');
+            addLog('User Added', `User with email ${userData.get('email')} was added.`);
             closeUserModal();
             loadUsers();
         } else {
-            alert("Error: " + data.message);
+            openGenericInfoModal('Error', data.message);
         }
     })
     .catch(error => {
         console.error('Error adding user:', error);
-        alert('An error occurred while adding the user.');
+        openGenericInfoModal('Error', 'An error occurred while adding the user.');
     });
 });
 
@@ -135,16 +147,17 @@ document.getElementById('editArtifactForm').addEventListener('submit', function(
     .then(response => response.json())
     .then(data => {
         if(data.success) {
-            alert("Artifact updated successfully!");
+            openGenericInfoModal('Success', 'Artifact updated successfully!');
+            addLog('Artifact Updated', `Artifact with ID ${formData.get('id')} was updated.`);
             closeEditArtifactModal();
             loadArtifacts();
         } else {
-            alert("Error: " + data.message);
+            openGenericInfoModal('Error', data.message);
         }
     })
     .catch(error => {
         console.error('Error updating artifact:', error);
-        alert('An error occurred while updating the artifact.');
+        openGenericInfoModal('Error', 'An error occurred while updating the artifact.');
     });
 });
 
@@ -161,25 +174,22 @@ document.getElementById('editUserForm').addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         if(data.success) {
-            alert("User updated successfully!");
+            openGenericInfoModal('Success', 'User updated successfully!');
+            addLog('User Updated', `User with ID ${userData.get('id')} was updated.`);
             closeEditUserModal();
             loadUsers();
         } else {
-            alert("Error: " + data.message);
+            openGenericInfoModal('Error', data.message);
         }
     })
     .catch(error => {
         console.error('Error updating user:', error);
-        alert('An error occurred while updating the user.');
+        openGenericInfoModal('Error', 'An error occurred while updating the user.');
     });
 });
 
-// Load Artifacts and Populate Table
-function loadArtifacts() {
-    const searchQuery = document.getElementById('artifactSearch').value;
-    const typeFilter = document.getElementById('typeFilter').value;
-    const dateFilter = document.getElementById('dateFilter').value;
-
+// Helper function to fetch artifacts
+function fetchArtifacts(searchQuery, typeFilter, dateFilter) {
     let url = 'php/admin_api.php?action=getArtifacts';
     const params = new URLSearchParams();
 
@@ -197,8 +207,16 @@ function loadArtifacts() {
         url += '&' + params.toString();
     }
 
-    fetch(url)
-    .then(response => response.json())
+    return fetch(url).then(response => response.json());
+}
+
+// Load Artifacts and Populate Table
+function loadArtifacts() {
+    const searchQuery = document.getElementById('artifactSearch').value;
+    const typeFilter = document.getElementById('typeFilter').value;
+    const dateFilter = document.getElementById('dateFilter').value;
+
+    fetchArtifacts(searchQuery, typeFilter, dateFilter)
     .then(data => {
         const tableBody = document.getElementById('artifactsTable');
         tableBody.innerHTML = ''; // Clear existing rows
@@ -227,7 +245,7 @@ function loadArtifacts() {
     })
     .catch(error => {
         console.error('Error loading artifacts:', error);
-        alert('An error occurred while loading artifacts.');
+        openGenericInfoModal('Error', 'An error occurred while loading artifacts.');
     });
 }
 
@@ -261,7 +279,7 @@ function loadUsers() {
     })
     .catch(error => {
         console.error('Error loading users:', error);
-        alert('An error occurred while loading users.');
+        openGenericInfoModal('Error', 'An error occurred while loading users.');
     });
 }
 
@@ -271,7 +289,7 @@ function editArtifact(id) {
     .then(response => response.json())
     .then(data => {
         if(data.error) {
-            alert("Error: " + data.error);
+            openGenericInfoModal('Error', data.error);
             return;
         }
         document.getElementById('editArtifactId').value = data.id;
@@ -292,7 +310,7 @@ function editArtifact(id) {
     })
     .catch(error => {
         console.error('Error fetching artifact data:', error);
-        alert('An error occurred while fetching artifact data.');
+        openGenericInfoModal('Error', 'An error occurred while fetching artifact data.');
     });
 }
 
@@ -302,7 +320,7 @@ function editUser(id) {
     .then(response => response.json())
     .then(data => {
         if(data.error) {
-            alert("Error: " + data.error);
+            openGenericInfoModal('Error', data.error);
             return;
         }
         document.getElementById('editUserId').value = data.id;
@@ -313,7 +331,7 @@ function editUser(id) {
     })
     .catch(error => {
         console.error('Error fetching user data:', error);
-        alert('An error occurred while fetching user data.');
+        openGenericInfoModal('Error', 'An error occurred while fetching user data.');
     });
 }
 
@@ -330,15 +348,16 @@ function deleteArtifact(id) {
         .then(response => response.json())
         .then(data => {
             if(data.success) {
-                alert("Artifact deleted successfully!");
+                openGenericInfoModal('Success', 'Artifact deleted successfully!');
+                addLog('Artifact Deleted', `Artifact with ID ${id} was deleted.`);
                 loadArtifacts();
             } else {
-                alert("Error: " + data.message);
+                openGenericInfoModal('Error', data.message);
             }
         })
         .catch(error => {
             console.error('Error deleting artifact:', error);
-            alert('An error occurred while deleting the artifact.');
+            openGenericInfoModal('Error', 'An error occurred while deleting the artifact.');
         });
     }
 }
@@ -356,15 +375,16 @@ function deleteUser(id) {
         .then(response => response.json())
         .then(data => {
             if(data.success) {
-                alert("User deleted successfully!");
+                openGenericInfoModal('Success', 'User deleted successfully!');
+                addLog('User Deleted', `User with ID ${id} was deleted.`);
                 loadUsers();
             } else {
-                alert("Error: " + data.message);
+                openGenericInfoModal('Error', data.message);
             }
         })
         .catch(error => {
             console.error('Error deleting user:', error);
-            alert('An error occurred while deleting the user.');
+            openGenericInfoModal('Error', 'An error occurred while deleting the user.');
         });
     }
 }
@@ -372,22 +392,8 @@ function deleteUser(id) {
 // Load Reports Table
 function loadReportsTable() {
     const searchQuery = document.getElementById('reportSearch').value;
-    const typeFilter = ''; // Not used in reports
-    const dateFilter = ''; // Not used in reports
 
-    let url = 'php/admin_api.php?action=getArtifacts';
-    const params = new URLSearchParams();
-
-    if (searchQuery) {
-        params.append('search_query', searchQuery);
-    }
-
-    if (params.toString()) {
-        url += '&' + params.toString();
-    }
-
-    fetch(url)
-    .then(response => response.json())
+    fetchArtifacts(searchQuery, '', '')
     .then(data => {
         const table = document.getElementById('reportsTable');
         const tableBody = table.getElementsByTagName('tbody')[0];
@@ -439,7 +445,7 @@ function loadReportsTable() {
     })
     .catch(error => {
         console.error('Error loading reports table:', error);
-        alert('An error occurred while loading the reports table.');
+        openGenericInfoModal('Error', 'An error occurred while loading the reports table.');
     });
 }
 
@@ -539,14 +545,6 @@ document.querySelector('#reports .search-btn').addEventListener('click', functio
     loadReportsTable();
 });
 
-document.getElementById('selectAllColumns').addEventListener('change', function() {
-    const checkboxes = document.querySelectorAll('#reportsTable thead input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = this.checked;
-    });
-    loadReportsTable();
-});
-
 document.querySelectorAll('#reportsTable thead input[type="checkbox"]').forEach(checkbox => {
     checkbox.addEventListener('change', () => {
         loadReportsTable();
@@ -564,25 +562,7 @@ function loadArtifactGallery() {
     const typeFilter = document.getElementById('galleryTypeFilter').value;
     const dateFilter = document.getElementById('galleryDateFilter').value;
 
-    let url = 'php/admin_api.php?action=getArtifacts';
-    const params = new URLSearchParams();
-
-    if (searchQuery) {
-        params.append('search_query', searchQuery);
-    }
-    if (typeFilter) {
-        params.append('type_filter', typeFilter);
-    }
-    if (dateFilter) {
-        params.append('date_filter', dateFilter);
-    }
-
-    if (params.toString()) {
-        url += '&' + params.toString();
-    }
-
-    fetch(url)
-    .then(response => response.json())
+    fetchArtifacts(searchQuery, typeFilter, dateFilter)
     .then(data => {
         const cardsContainer = document.getElementById('artifactCardsContainer');
         cardsContainer.innerHTML = ''; // Clear existing cards
@@ -617,7 +597,7 @@ function loadArtifactGallery() {
     })
     .catch(error => {
         console.error('Error loading artifact gallery:', error);
-        alert('An error occurred while loading the artifact gallery.');
+        openGenericInfoModal('Error', 'An error occurred while loading the artifact gallery.');
     });
 }
 
@@ -626,7 +606,7 @@ function openArtifactDetailsModal(id) {
     .then(response => response.json())
     .then(data => {
         if(data.error) {
-            alert("Error: " + data.error);
+            openGenericInfoModal('Error', data.error);
             return;
         }
         document.getElementById('detailObjectHead').textContent = data.object_head;
@@ -652,7 +632,7 @@ function openArtifactDetailsModal(id) {
     })
     .catch(error => {
         console.error('Error fetching artifact details:', error);
-        alert('An error occurred while fetching artifact details.');
+        openGenericInfoModal('Error', 'An error occurred while fetching artifact details.');
     });
 }
 
@@ -673,17 +653,30 @@ function updateImageViewer() {
 
 // Load System Logs and Populate Table
 function loadSystemLogs() {
+    const tableBody = document.getElementById('logsTableBody');
+    if (!tableBody) {
+        console.error('logsTableBody not found');
+        return;
+    }
+
     fetch('php/admin_api.php?action=getSystemLogs')
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        const tableBody = document.getElementById('logsTable');
+        if (data.error) {
+            throw new Error(data.error);
+        }
         tableBody.innerHTML = ''; // Clear existing rows
 
         data.forEach(log => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${log.created_at}</td>
-                <td>${log.user_id || 'N/A'}</td>
+                <td>${log.user_name || 'N/A'}</td>
                 <td>${log.action}</td>
                 <td>${log.details}</td>
             `;
@@ -692,6 +685,27 @@ function loadSystemLogs() {
     })
     .catch(error => {
         console.error('Error loading system logs:', error);
+        tableBody.innerHTML = `<tr><td colspan="4">Error loading system logs: ${error.message}</td></tr>`;
+    });
+}
+
+function addLog(action, details) {
+    const userId = 1; // Replace with actual user ID from session or auth
+    fetch('php/admin_api.php?action=add_log', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ user_id: userId, action: action, details: details })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            console.error('Failed to add log');
+        }
+    })
+    .catch(error => {
+        console.error('Error adding log:', error);
     });
 }
 
@@ -736,7 +750,6 @@ function updateDashboardStats() {
 // Initial data load when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     updateDashboardStats();
-    loadArtifacts(); // Load artifacts for the default active section
     loadUsers();
     loadSystemLogs();
 
@@ -748,14 +761,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelector('#reports .search-btn').addEventListener('click', function() {
-        loadReportsTable();
-    });
-
-    document.getElementById('selectAllColumns').addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('#reportsTable thead input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
         loadReportsTable();
     });
 
@@ -810,95 +815,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.querySelector('.search-btn').addEventListener('click', function() {
+    document.querySelector('#artifacts .search-btn').addEventListener('click', function() {
         loadArtifacts();
     });
 
     document.getElementById('typeFilter').addEventListener('change', loadArtifacts);
     document.getElementById('dateFilter').addEventListener('change', loadArtifacts);
-});
-
-
-// Event Listeners for Artifact Filters and Search (existing)
-document.getElementById('artifactSearch').addEventListener('keyup', function(event) {
-    if (event.key === 'Enter') {
-        loadArtifacts();
-    }
-});
-
-document.querySelector('.search-btn').addEventListener('click', function() {
-    loadArtifacts();
-});
-
-document.getElementById('typeFilter').addEventListener('change', loadArtifacts);
-document.getElementById('dateFilter').addEventListener('change', loadArtifacts);
-
-// Load System Logs and Populate Table
-function loadSystemLogs() {
-    fetch('php/admin_api.php?action=getSystemLogs')
-    .then(response => response.json())
-    .then(data => {
-        const tableBody = document.getElementById('logsTable');
-        tableBody.innerHTML = ''; // Clear existing rows
-
-        data.forEach(log => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${log.created_at}</td>
-                <td>${log.user_id || 'N/A'}</td>
-                <td>${log.action}</td>
-                <td>${log.details}</td>
-            `;
-            tableBody.appendChild(row);
-        });
-    })
-    .catch(error => {
-        console.error('Error loading system logs:', error);
-    });
-}
-
-// Update Dashboard Statistics
-function updateDashboardStats() {
-    // Fetch total artifacts
-    fetch('php/admin_api.php?action=getArtifacts')
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('totalArtifacts').textContent = data.length;
-    })
-    .catch(error => console.error('Error fetching total artifacts:', error));
-
-    // Fetch total users
-    fetch('php/admin_api.php?action=getUsers')
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('totalUsers').textContent = data.length;
-    })
-    .catch(error => console.error('Error fetching total users:', error));
-
-    // Fetch recent activity (system logs)
-    fetch('php/admin_api.php?action=getSystemLogs')
-    .then(response => response.json())
-    .then(data => {
-        const recentActivityDiv = document.getElementById('recentActivity');
-        recentActivityDiv.innerHTML = '';
-        // Display up to 5 recent activities
-        data.slice(0, 5).forEach(log => {
-            const activityItem = document.createElement('div');
-            activityItem.classList.add('activity-item');
-            activityItem.innerHTML = `
-                <span class="activity-time">${new Date(log.created_at).toLocaleString()}</span>
-                <span class="activity-description">${log.details}</span>
-            `;
-            recentActivityDiv.appendChild(activityItem);
-        });
-    })
-    .catch(error => console.error('Error fetching recent activity:', error));
-}
-
-// Initial data load when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    updateDashboardStats();
-    loadArtifacts(); // Load artifacts for the default active section
-    loadUsers();
-    loadSystemLogs();
 });
