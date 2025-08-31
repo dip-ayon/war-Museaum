@@ -184,6 +184,8 @@ body {
     font-weight: 700;
     color: var(--gray-800);
     margin-bottom: 0.5rem;
+    border-bottom: 2px solid var(--gray-200);
+    padding-bottom: 0.5rem;
 }
 
 .section-header p {
@@ -208,10 +210,12 @@ body {
     align-items: center;
     gap: 1rem;
     transition: var(--transition);
+    flex-direction: column;
+    text-align: center;
 }
 
 .stat-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-5px);
     box-shadow: var(--shadow-lg);
 }
 
@@ -223,7 +227,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 2rem;
     color: white;
 }
 
@@ -327,7 +331,7 @@ body {
 }
 
 .btn-primary:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
 
@@ -434,17 +438,21 @@ body {
     text-align: left;
     font-weight: 600;
     color: var(--gray-700);
-    border-bottom: 1px solid var(--gray-200);
+    border: 1px solid var(--gray-200); /* Changed from border-bottom */
 }
 
 .admin-table td {
     padding: 1rem;
-    border-bottom: 1px solid var(--gray-200);
+    border: 1px solid var(--gray-200); /* Changed from border-bottom */
     vertical-align: middle;
 }
 
+.admin-table tbody tr:nth-child(even) {
+    background-color: var(--gray-200);
+}
+
 .admin-table tbody tr:hover {
-    background: var(--gray-100);
+    background: var(--gray-300);
 }
 
 .table-actions {
@@ -497,6 +505,18 @@ body {
     border: 1px solid var(--gray-300);
     border-radius: var(--border-radius);
     font-family: 'Poppins', sans-serif;
+}
+
+/* Specific styling for file input */
+.form-group input[type="file"] {
+    padding: 0.5rem 1rem; /* Adjust padding for file input */
+    height: auto; /* Allow height to adjust based on content */
+}
+
+/* Adjust form-grid for better spacing */
+.form-grid {
+    gap: 1.5rem; /* Increased gap for better spacing */
+    padding: 1.5rem 2rem; /* Adjusted padding */
 }
 
 .form-group input:focus,
@@ -594,7 +614,7 @@ body {
 /* Modal Styles */
 .modal {
     display: none;
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
@@ -612,62 +632,57 @@ body {
 }
 
 .modal-content {
-    background: white;
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-xl);
-    max-width: 800px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--gray-200);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin: 0;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    max-width: 1200px;
+    max-height: 600px;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative; 
+    overflow: hidden; /* Prevent content from overflowing */
 }
 
 .close-btn {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 2rem;
     cursor: pointer;
-    color: var(--gray-500);
+    color: #9c0000;
     padding: 0.5rem;
     border-radius: 50%;
-    transition: var(--transition);
+    transition: all 0.3s ease;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
 }
 
+
 .close-btn:hover {
-    background: var(--gray-100);
-    color: var(--gray-700);
+    background: #f6f3f3; /* gray-100 */
+    color: #374151; /* gray-700 */
 }
 
 /* Form Grid */
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    padding: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, .5fr));
+    gap: .8rem;
+    padding: 1rem;
 }
 
-.form-group.full-width {
-    grid-column: 1 / -1;
-}
+/* .form-group.full-width {
+    grid-column: 4 / -1;
+} */
 
-.form-group small {
-    color: var(--gray-600);
+/* .form-group small {
+    color: #4b5563; 
     font-size: 0.8rem;
     margin-top: 0.25rem;
-}
+} 
+*/
+
 
 /* Notification Container */
 .notification-container {
@@ -767,7 +782,8 @@ body {
     }
     
     .modal-content {
-        width: 95%;
+        
+        width: 90%;
         margin: 1rem;
     }
 }

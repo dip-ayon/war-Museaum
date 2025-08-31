@@ -58,6 +58,10 @@
                 <i class="fas fa-list-alt"></i>
                 System Logs
             </button>
+            <button class="nav-btn" data-section="artifactGallery">
+                <i class="fas fa-images"></i>
+                Artifact Gallery
+            </button>
         </div>
         </nav>
 
@@ -119,11 +123,11 @@
                 <div class="dashboard-card">
                     <h3>Quick Actions</h3>
                     <div class="quick-actions">
-                        <button class="btn btn-primary" onclick="showSection('artifacts')">
+                        <button class="btn btn-primary" onclick="openUploadModal()">
                             <i class="fas fa-plus"></i>
                             Upload Artifact
                         </button>
-                        <button class="btn btn-outline" onclick="showSection('users')">
+                        <button class="btn btn-outline" onclick="openUserModal()">
                             <i class="fas fa-user-plus"></i>
                             Add User
                         </button>
@@ -175,10 +179,12 @@
                     <thead>
                         <tr>
                             <th>Collection No.</th>
-                            <th>Name</th>
-                            <th>Type</th>
+                            <th>Accession No.</th>
+                            <th>Object Collection date</th>
                             <th>Donor</th>
-                            <th>Date Added</th>
+                            <th>Description</th>
+                            <th>Object type</th>
+                            <th>Object head</th>
                             <th>Actions</th>
                             </tr>
                         </thead>
@@ -207,7 +213,7 @@
                             <th>Email</th>
                             <th>Role</th>
                             <th>Status</th>
-                            <th>Join Date</th>
+                            <th>Created At</th>
                             <th>Actions</th>
                             </tr>
                         </thead>
@@ -224,52 +230,89 @@
                 <h2>Report Generation</h2>
                 <p>Generate detailed reports about artifacts and system usage</p>
             </div>
+
+            <div class="filters-bar">
+                <div class="search-box">
+                    <input type="text" id="reportSearch" placeholder="Search reports...">
+                    <button class="search-btn" aria-label="Search reports">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
             
-            <div class="reports-grid">
-                <div class="report-card">
-                    <h3>Artifact Report</h3>
-                    <form class="report-form">
-                        <div class="form-group">
-                            <label>Sort By:</label>
-                                                        <select id="sortBy" aria-label="Sort report by">
-                                <option value="collectionNo">Collection No.</option>
-                                <option value="collectionDate">Collection Date</option>
-                                <option value="objectType">Object Type</option>
-                                <option value="objectHead">Object Head</option>
-                            </select>
-                    </div>
-                        <div class="form-group">
-                            <label>Date Range:</label>
-                            <div class="date-range">
-                                <input type="date" id="startDate" aria-label="Start date">
-                                <span>to</span>
-                                <input type="date" id="endDate" aria-label="End date">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Columns to Include:</label>
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" value="collectionNo" checked> Collection No.</label>
-                                <label><input type="checkbox" value="accessionNo" checked> Accession No.</label>
-                                <label><input type="checkbox" value="donor" checked> Donor</label>
-                                <label><input type="checkbox" value="objectType" checked> Object Type</label>
-                                <label><input type="checkbox" value="objectHead" checked> Object Head</label>
-                                <label><input type="checkbox" value="collectionDate" checked> Collection Date</label>
-                            </div>
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-primary" onclick="generateReport()">
-                                <i class="fas fa-file-alt"></i>
-                                Generate Report
-                            </button>
-                            <button type="button" class="btn btn-outline" onclick="downloadExcel()">
-                                <i class="fas fa-file-excel"></i>
-                                Download Excel
-                            </button>
-                        </div>
-                    </form>
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="printReport()">
+                    <i class="fas fa-print"></i>
+                    Print Report
+                </button>
+                <button type="button" class="btn btn-outline" onclick="downloadReportAsExcel()">
+                    <i class="fas fa-file-excel"></i>
+                    Download Excel
+                </button>
+                <button type="button" class="btn btn-outline" onclick="loadReportsTable()">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh
+                </button>
+            </div>
+
+            <div class="table-container" style="overflow: auto;">
+                <table class="admin-table" id="reportsTable">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" data-column="collection_no" checked> Collection No. <button class="sort-btn" data-sort="collection_no"><i class="fas fa-sort"></i></button></th>
+                            <th><input type="checkbox" data-column="accession_no" checked> Accession No. <button class="sort-btn" data-sort="accession_no"><i class="fas fa-sort"></i></button></th>
+                            <th><input type="checkbox" data-column="object_head" checked> Object Head <button class="sort-btn" data-sort="object_head"><i class="fas fa-sort"></i></button></th>
+                            <th><input type="checkbox" data-column="object_type" checked> Object Type <button class="sort-btn" data-sort="object_type"><i class="fas fa-sort"></i></button></th>
+                            <th><input type="checkbox" data-column="donor" checked> Donor <button class="sort-btn" data-sort="donor"><i class="fas fa-sort"></i></button></th>
+                            <th><input type="checkbox" data-column="collection_date" checked> Collection Date <button class="sort-btn" data-sort="collection_date"><i class="fas fa-sort"></i></button></th>
+                            <th><input type="checkbox" data-column="description" checked> Description <button class="sort-btn" data-sort="description"><i class="fas fa-sort"></i></button></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Reports will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- System Logs Section -->
+        <section id="logs" class="admin-section">
+            <div class="section-header">
+                <h2>System Logs</h2>
+                <p>Monitor system activity and user actions</p>
+            </div>
+            
+            <div class="logs-container">
+                <div class="logs-filters">
+                    <select id="logLevel" aria-label="Filter by log level">
+                        <option value="">All Levels</option>
+                        <option value="info">Info</option>
+                        <option value="warning">Warning</option>
+                        <option value="error">Error</option>
+                    </select>
+                    <input type="date" id="logDate" aria-label="Filter by log date">
+                    <button class="btn btn-outline" onclick="loadSystemLogs()">
+                        <i class="fas fa-refresh"></i>
+                        Refresh
+                    </button>
                 </div>
                 
+                <div class="logs-table">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Created At</th>
+                                <th>User ID</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTable">
+                            <!-- Logs will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
                 <div class="report-card">
                     <h3>System Statistics</h3>
                     <div class="stats-list">
@@ -290,48 +333,41 @@
                             <span class="stat-value" id="storageUsed">0 MB</span>
                         </div>
                     </div>
-                    </div>
                 </div>
+            </div>
         </section>
 
-        <!-- System Logs Section -->
-        <section id="logs" class="admin-section">
+        <!-- Artifact Gallery Section -->
+        <section id="artifactGallery" class="admin-section">
             <div class="section-header">
-                <h2>System Logs</h2>
-                <p>Monitor system activity and user actions</p>
+                <h2>Artifact Gallery</h2>
+                <p>Browse and view detailed information about artifacts.</p>
             </div>
-            
-            <div class="logs-container">
-                <div class="logs-filters">
-                    <select id="logLevel" aria-label="Filter by log level">
-                        <option value="">All Levels</option>
-                        <option value="info">Info</option>
-                        <option value="warning">Warning</option>
-                        <option value="error">Error</option>
-                    </select>
-                    <input type="date" id="logDate" aria-label="Filter by log date">
-                    <button class="btn btn-outline" onclick="refreshLogs()">
-                        <i class="fas fa-refresh"></i>
-                        Refresh
+            <div class="filters-bar">
+                <div class="search-box">
+                    <input type="text" id="galleryArtifactSearch" placeholder="Search artifacts in gallery...">
+                    <button class="search-btn" aria-label="Search artifacts in gallery">
+                        <i class="fas fa-search"></i>
                     </button>
                 </div>
-                
-                <div class="logs-table">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Timestamp</th>
-                                <th>Level</th>
-                                <th>User</th>
-                                <th>Action</th>
-                                <th>Details</th>
-                            </tr>
-                        </thead>
-                        <tbody id="logsTable">
-                            <!-- Logs will be loaded here -->
-                        </tbody>
-                    </table>
+                <div class="filter-options">
+                    <select id="galleryTypeFilter" aria-label="Filter by artifact type in gallery">
+                        <option value="">All Types</option>
+                        <option value="document">Documents</option>
+                        <option value="weapon">Weapons</option>
+                        <option value="personal">Personal Items</option>
+                        <option value="photo">Photos</option>
+                    </select>
+                    <select id="galleryDateFilter" aria-label="Filter by date in gallery">
+                        <option value="">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
                 </div>
+            </div>
+            <div id="artifactCardsContainer" class="card-grid">
+                <!-- Artifact cards will be loaded here -->
             </div>
         </section>
     </main>
@@ -414,6 +450,88 @@
         </div>
     </div>
 
+    <!-- Edit Artifact Modal -->
+    <div id="editArtifactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Artifact</h2>
+                <button class="close-btn" onclick="closeEditArtifactModal()">&times;</button>
+            </div>
+            <form id="editArtifactForm" enctype=
+            
+            
+            "multipart/form-data">
+                <input type="hidden" id="editArtifactId" name="id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editCollectionNumber">Collection Number *</label>
+                        <input type="text" id="editCollectionNumber" name="collection_no" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAccessionNumber">Accession Number *</label>
+                        <input type="text" id="editAccessionNumber" name="accession_no" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCollectionDate">Collection Date *</label>
+                        <input type="date" id="editCollectionDate" name="collection_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editContributorName">Contributor Name *</label>
+                        <input type="text" id="editContributorName" name="donor" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editObjectType">Object Type *</label>
+                        <input type="text" id="editObjectType" name="object_type" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editObjectHead">Object Head *</label>
+                        <input type="text" id="editObjectHead" name="object_head" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editDescription">Description *</label>
+                        <textarea id="editDescription" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editMeasurement">Measurement</label>
+                        <input type="text" id="editMeasurement" name="measurement">
+                    </div>
+                    <div class="form-group">
+                        <label for="editGalleryNumber">Gallery Number</label>
+                        <input type="text" id="editGalleryNumber" name="gallery_no">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editFoundPlace">Found Place Information</label>
+                        <input type="text" id="editFoundPlace" name="found_place">
+                    </div>
+                    <div class="form-group">
+                        <label for="editExperimentFormula">Experiment Formula</label>
+                        <input type="text" id="editExperimentFormula" name="experiment_formula">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editSignificance">Significance Comment</label>
+                        <textarea id="editSignificance" name="significance_comment" rows="2"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editCorrection">Correction</label>
+                        <input type="text" id="editCorrection" name="correction">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editArtifactImages">Artifact Images (Max 5 images)</label>
+                        <input type="file" id="editArtifactImages" name="images" multiple accept="image/*">
+                        <small>Select up to 5 images for this artifact (replaces existing images)</small>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeEditArtifactModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- User Modal -->
     <div id="userModal" class="modal">
         <div class="modal-content">
@@ -449,6 +567,96 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit User</h2>
+                <button class="close-btn" onclick="closeEditUserModal()">&times;</button>
+            </div>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId" name="id">
+                <div class="form-group">
+                    <label for="editUserName">Full Name *</label>
+                    <input type="text" id="editUserName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserEmail">Email Address *</label>
+                    <input type="email" id="editUserEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserRole">Role *</label>
+                    <select id="editUserRole" name="role" required>
+                        <option value="user">User</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeEditUserModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Artifact Details Modal -->
+    <div id="artifactDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detailObjectHead">Artifact Details</h2>
+                <button class="close-btn" onclick="closeArtifactDetailsModal()">&times;</button>
+            </div>
+            <div class="artifact-details-content">
+                <div class="image-viewer">
+                    <img id="detailImage" src="" alt="Artifact Image">
+                    <div class.image-nav">
+                        <button class="nav-arrow left" id="prevImage"><i class="fas fa-chevron-left"></i></button>
+                        <button class="nav-arrow right" id="nextImage"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="zoom-controls">
+                        <button id="zoomIn"><i class="fas fa-search-plus"></i></button>
+                        <button id="zoomOut"><i class="fas fa-search-minus"></i></button>
+                    </div>
+                </div>
+                <div class="details-text">
+                    <h3>General Information</h3>
+                    <p><strong>Collection No.:</strong> <span id="detailCollectionNo"></span></p>
+                    <p><strong>Accession No.:</strong> <span id="detailAccessionNo"></span></p>
+                    <p><strong>Object Type:</strong> <span id="detailObjectType"></span></p>
+                    <p><strong>Donor:</strong> <span id="detailDonor"></span></p>
+                    <p><strong>Collection Date:</strong> <span id="detailCollectionDate"></span></p>
+                    <p><strong>Measurement:</strong> <span id="detailMeasurement"></span></p>
+                    <p><strong>Gallery No.:</strong> <span id="detailGalleryNo"></span></p>
+                    <p><strong>Found Place:</strong> <span id="detailFoundPlace"></span></p>
+                    <p><strong>Experiment Formula:</strong> <span id="detailExperimentFormula"></span></p>
+                    <p><strong>Significance Comment:</strong> <span id="detailSignificanceComment"></span></p>
+                    <p><strong>Correction:</strong> <span id="detailCorrection"></span></p>
+                    <h3>Description</h3>
+                    <p id="detailDescription"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Info Modal -->
+    <div id="genericInfoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="genericInfoModalTitle">Modal Title</h2>
+                <button class="close-btn" onclick="closeGenericInfoModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="genericInfoModalMessage">This is a generic modal message.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeGenericInfoModal()">Close</button>
+            </div>
         </div>
     </div>
 

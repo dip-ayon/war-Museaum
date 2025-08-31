@@ -13,19 +13,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize the application
 function initializeApp() {
-            // Check if user is logged in
-        const token = localStorage.getItem('authToken');
-        if (token) {
-            currentUser = JSON.parse(localStorage.getItem('user'));
-            updateAuthButtons();
-        }
-        
-        // Set default admin email in login form for convenience
-        const loginEmail = document.getElementById('loginEmail');
-        if (loginEmail) {
-            loginEmail.placeholder = 'admin@museum.org';
-        }
-    
+    // Check if user is logged in
+    const token = localStorage.getItem('authToken');
+    if (token) {
+        currentUser = JSON.parse(localStorage.getItem('user'));
+        updateAuthButtons();
+    }
+
+    // Set default admin email in login form for convenience
+    const loginEmail = document.getElementById('loginEmail');
+    if (loginEmail) {
+        loginEmail.placeholder = 'admin@museum.org';
+    }
+
     // Initialize AOS (Animate On Scroll)
     if (typeof AOS !== 'undefined') {
         AOS.init({
@@ -42,14 +42,14 @@ function setupEventListeners() {
     // Mobile menu toggle
     const mobileToggle = document.querySelector('.mobile-menu-toggle');
     const nav = document.querySelector('.main-nav');
-    
+
     if (mobileToggle) {
         mobileToggle.addEventListener('click', () => {
             nav.classList.toggle('active');
             mobileToggle.classList.toggle('active');
         });
     }
-    
+
     // Navigation links
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
@@ -57,23 +57,23 @@ function setupEventListeners() {
             e.preventDefault();
             const target = link.getAttribute('href').substring(1);
             scrollToSection(target);
-            
+
             // Update active state
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
         });
     });
-    
+
     // Search functionality
-    const searchInput = document.getElementById('searchValue');
+    const searchInput = document.getElementById('slideshowSearchValue');
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                searchArtifacts();
+                searchArtifactsFromSlideshow();
             }
         });
     }
-    
+
     // Filter buttons
     const filterBtns = document.querySelectorAll('.filter-btn');
     filterBtns.forEach(btn => {
@@ -83,7 +83,7 @@ function setupEventListeners() {
             filterArtifacts(btn.dataset.filter);
         });
     });
-    
+
     // Smooth scrolling for all anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -98,26 +98,26 @@ function setupEventListeners() {
 function startSlideshow() {
     const slides = document.querySelectorAll('.slides');
     const indicators = document.querySelectorAll('.indicator');
-    
+
     if (slides.length === 0) return;
-    
+
     function showSlide(index) {
         slides.forEach(slide => slide.classList.remove('active'));
         indicators.forEach(indicator => indicator.classList.remove('active'));
-        
+
         slides[index].classList.add('active');
         indicators[index].classList.add('active');
         currentSlideIndex = index;
     }
-    
+
     function nextSlide() {
         currentSlideIndex = (currentSlideIndex + 1) % slides.length;
         showSlide(currentSlideIndex);
     }
-    
+
     // Auto-advance slides
     slideshowInterval = setInterval(nextSlide, 5000);
-    
+
     // Pause on hover
     const slideshow = document.querySelector('.slideshow');
     if (slideshow) {
@@ -132,17 +132,17 @@ function startSlideshow() {
 window.plusSlides = function(n) {
     const slides = document.querySelectorAll('.slides');
     const indicators = document.querySelectorAll('.indicator');
-    
+
     if (slides.length === 0) return;
-    
+
     currentSlideIndex = (currentSlideIndex + n + slides.length) % slides.length;
-    
+
     slides.forEach(slide => slide.classList.remove('active'));
     indicators.forEach(indicator => indicator.classList.remove('active'));
-    
+
     slides[currentSlideIndex].classList.add('active');
     indicators[currentSlideIndex].classList.add('active');
-    
+
     // Reset interval
     clearInterval(slideshowInterval);
     slideshowInterval = setInterval(() => {
@@ -157,17 +157,17 @@ window.plusSlides = function(n) {
 window.currentSlide = function(n) {
     const slides = document.querySelectorAll('.slides');
     const indicators = document.querySelectorAll('.indicator');
-    
+
     if (slides.length === 0) return;
-    
+
     currentSlideIndex = n - 1;
-    
+
     slides.forEach(slide => slide.classList.remove('active'));
     indicators.forEach(indicator => indicator.classList.remove('active'));
-    
+
     slides[currentSlideIndex].classList.add('active');
     indicators[currentSlideIndex].classList.add('active');
-    
+
     // Reset interval
     clearInterval(slideshowInterval);
     slideshowInterval = setInterval(() => {
@@ -193,17 +193,17 @@ function scrollToSection(sectionId) {
 // Authentication functions
 async function registerUser(userData) {
     try {
-        const response = await fetch('/api/auth/register', {
+        const response = await fetch('php/admin_api.php?action=register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(userData)
         });
-        
+
         const data = await response.json();
-        
-        if (response.ok) {
+
+        if (data.success) {
             showNotification('Registration successful! Please login.', 'success');
             closeRegisterModal();
             openLoginModal();
@@ -217,29 +217,29 @@ async function registerUser(userData) {
 
 async function loginUser(credentials) {
     try {
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch('php/admin_api.php?action=login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(credentials)
         });
-        
+
         const data = await response.json();
-        
-        if (response.ok) {
+
+        if (data.success) {
             localStorage.setItem('authToken', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             currentUser = data.user;
-            
+
             updateAuthButtons();
             closeLoginModal();
             showNotification(`Welcome back, ${data.user.name}!`, 'success');
-            
+
             // Redirect to admin panel if admin
             if (data.user.role === 'admin') {
                 setTimeout(() => {
-                    window.location.href = '/admin';
+                    window.location.href = 'admin.html';
                 }, 1000);
             }
         } else {
@@ -261,7 +261,7 @@ function logout() {
 function updateAuthButtons() {
     const authButtons = document.querySelector('.auth-buttons');
     if (!authButtons) return;
-    
+
     if (currentUser) {
         authButtons.innerHTML = `
             <div class="user-menu">
@@ -274,8 +274,8 @@ function updateAuthButtons() {
                         <i class="fas fa-user-circle"></i>
                         Profile
                     </a>
-                    ${currentUser.role === 'admin' ? 
-                        '<a href="/admin"><i class="fas fa-cog"></i> Admin Panel</a>' : ''}
+                    ${currentUser.role === 'admin' ?
+                        '<a href="admin.html"><i class="fas fa-cog"></i> Admin Panel</a>' : ''}
                     <a href="#" onclick="logout()">
                         <i class="fas fa-sign-out-alt"></i>
                         Logout
@@ -340,47 +340,22 @@ function openExploreModal() {
 }
 
 // Search and filter functions
-async function searchArtifacts() {
-    const searchType = document.getElementById('searchType')?.value || 'collectionNo';
-    const searchValue = document.getElementById('searchValue')?.value || '';
-    
-    if (!searchValue.trim()) {
-        showNotification('Please enter a search term', 'warning');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`/api/artifacts?searchBy=${searchType}&searchValue=${encodeURIComponent(searchValue)}`);
-        const artifacts = await response.json();
-        
-        displayArtifacts(artifacts);
-        updateResultCount(artifacts.length);
-        
-        if (artifacts.length === 0) {
-            showNotification('No artifacts found matching your search', 'info');
-        }
-    } catch (error) {
-        showNotification('Search failed. Please try again.', 'error');
-    }
-}
-
-// Search from slideshow
 async function searchArtifactsFromSlideshow() {
-    const searchType = document.getElementById('slideshowSearchType')?.value || 'collectionNo';
-    const searchValue = document.getElementById('slideshowSearchValue')?.value || '';
-    
+    const searchType = document.getElementById('slideshowSearchType')?.value;
+    const searchValue = document.getElementById('slideshowSearchValue')?.value;
+
     if (!searchValue.trim()) {
         showNotification('Please enter a search term', 'warning');
         return;
     }
-    
+
     try {
-        const response = await fetch(`/api/artifacts?searchBy=${searchType}&searchValue=${encodeURIComponent(searchValue)}`);
+        const response = await fetch(`php/api.php?action=search_artifacts&type=${searchType}&value=${encodeURIComponent(searchValue)}`);
         const artifacts = await response.json();
-        
+
         displayArtifacts(artifacts);
         updateResultCount(artifacts.length);
-        
+
         if (artifacts.length === 0) {
             showNotification('No artifacts found matching your search', 'info');
         } else {
@@ -396,23 +371,29 @@ function filterArtifacts(filter) {
     // This would typically make an API call with filter parameters
     // For now, we'll just show a notification
     showNotification(`Filtering by: ${filter}`, 'info');
+    loadArtifacts(filter);
 }
 
-async function loadArtifacts() {
+async function loadArtifacts(filter = 'all') {
     try {
-        const response = await fetch('/api/artifacts');
+        let url = 'php/api.php?action=get_artifacts';
+        if (filter !== 'all') {
+            url = `php/api.php?action=search_artifacts&type=object_type&value=${filter}`;
+        }
+        const response = await fetch(url);
         const artifacts = await response.json();
-        
-        displayArtifacts(artifacts.slice(0, 6)); // Show first 6 artifacts
+
+        displayArtifacts(artifacts);
     } catch (error) {
         console.error('Failed to load artifacts:', error);
     }
 }
 
+
 function displayArtifacts(artifacts) {
     const grid = document.getElementById('artifactsGrid');
     if (!grid) return;
-    
+
     if (artifacts.length === 0) {
         grid.innerHTML = `
             <div class="no-results">
@@ -423,14 +404,13 @@ function displayArtifacts(artifacts) {
         `;
         return;
     }
-    
+
     grid.innerHTML = artifacts.map(artifact => `
-        <div class="artifact-card" data-aos="fade-up">
+        <div class="artifact-card" data-aos="fade-up" onclick="viewArtifact(${artifact.id})">
             <div class="artifact-img">
-                <img src="/public/assets/images/img${Math.floor(Math.random() * 5) + 1}.jpg" 
-                     alt="${artifact.object_head || 'Artifact'}">
+                <img src="assets/images/${artifact.images[0]}" alt="${artifact.object_head || 'Artifact'}">
                 <div class="artifact-overlay">
-                    <button class="btn btn-primary" onclick="viewArtifact(${artifact.id})">
+                    <button class="btn btn-primary">
                         <i class="fas fa-eye"></i>
                         View Details
                     </button>
@@ -442,7 +422,7 @@ function displayArtifacts(artifacts) {
                     <span><i class="fas fa-hashtag"></i> ${artifact.collection_no}</span>
                     <span><i class="fas fa-user"></i> ${artifact.donor || 'Unknown'}</span>
                 </div>
-                <p>${artifact.description || 'No description available'}</p>
+                <p>${artifact.description ? artifact.description.substring(0, 100) + '...' : 'No description available'}</p>
                 <div class="artifact-tags">
                     <span class="tag">${artifact.object_type || 'Unknown Type'}</span>
                     <span class="tag">${artifact.collection_date || 'Unknown Date'}</span>
@@ -452,6 +432,7 @@ function displayArtifacts(artifacts) {
     `).join('');
 }
 
+
 function updateResultCount(count) {
     const resultCount = document.getElementById('resultCount');
     if (resultCount) {
@@ -459,10 +440,55 @@ function updateResultCount(count) {
     }
 }
 
-function viewArtifact(id) {
-    // This would open a detailed view modal
-    showNotification(`Viewing artifact ${id}`, 'info');
+async function viewArtifact(id) {
+    try {
+        const response = await fetch(`php/api.php?action=get_artifacts`);
+        const artifacts = await response.json();
+        const artifact = artifacts.find(a => a.id == id);
+
+        if (artifact) {
+            const modal = document.getElementById('artifactModal');
+            const modalBody = document.getElementById('artifactModalBody');
+
+            let imagesHtml = '';
+            if (artifact.images && artifact.images.length > 0) {
+                imagesHtml = artifact.images.map(image => `<img src="assets/images/${image}" alt="${artifact.object_head}" class="img-fluid mb-2">`).join('');
+            }
+
+            modalBody.innerHTML = `
+                <h2>${artifact.object_head}</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        ${imagesHtml}
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Collection No:</strong> ${artifact.collection_no}</p>
+                        <p><strong>Accession No:</strong> ${artifact.accession_no}</p>
+                        <p><strong>Collection Date:</strong> ${artifact.collection_date}</p>
+                        <p><strong>Donor:</strong> ${artifact.donor}</p>
+                        <p><strong>Object Type:</strong> ${artifact.object_type}</p>
+                        <p><strong>Description:</strong> ${artifact.description}</p>
+                        <p><strong>Measurement:</strong> ${artifact.measurement}</p>
+                        <p><strong>Gallery No:</strong> ${artifact.gallery_no}</p>
+                        <p><strong>Found Place:</strong> ${artifact.found_place}</p>
+                        <p><strong>Significance/Comment:</strong> ${artifact.significance_comment}</p>
+                    </div>
+                </div>
+            `;
+            modal.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Failed to load artifact details:', error);
+    }
 }
+
+function closeArtifactModal() {
+    const modal = document.getElementById('artifactModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
 
 // Utility functions
 function showNotification(message, type = 'info') {
@@ -476,13 +502,13 @@ function showNotification(message, type = 'info') {
             <i class="fas fa-times"></i>
         </button>
     `;
-    
+
     // Add to page
     document.body.appendChild(notification);
-    
+
     // Animate in
     setTimeout(() => notification.classList.add('show'), 100);
-    
+
     // Auto remove after 5 seconds
     setTimeout(() => {
         notification.classList.remove('show');
@@ -509,7 +535,7 @@ window.onclick = function(event) {
             document.body.style.overflow = 'auto';
         }
     });
-    
+
     // Close user dropdown when clicking outside
     const userDropdown = document.getElementById('userDropdown');
     if (userDropdown && !event.target.closest('.user-menu')) {
@@ -528,7 +554,7 @@ document.addEventListener('submit', function(e) {
         };
         loginUser(credentials);
     }
-    
+
     if (e.target.id === 'registerForm') {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -547,8 +573,9 @@ window.closeLoginModal = closeLoginModal;
 window.openRegisterModal = openRegisterModal;
 window.closeRegisterModal = closeRegisterModal;
 window.openExploreModal = openExploreModal;
-window.searchArtifacts = searchArtifacts;
 window.searchArtifactsFromSlideshow = searchArtifactsFromSlideshow;
 window.scrollToSection = scrollToSection;
 window.logout = logout;
 window.toggleUserMenu = toggleUserMenu;
+window.viewArtifact = viewArtifact;
+window.closeArtifactModal = closeArtifactModal;
