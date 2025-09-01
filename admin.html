@@ -15,7 +15,7 @@
         <div class="header-content">
             <div class="logo">
                 <div class="logo-icon">
-                    <i class="fas fa-landmark"></i>
+                    <img src="assets/images/logo.png" alt="Logo" style="width:80px; height:auto;">
                 </div>
                 <div class="logo-text">
                     <h1>Liberation War Museum</h1>
@@ -25,7 +25,7 @@
             <div class="user-info">
                 <div class="user-details">
                     <span id="adminName">Admin User</span>
-                    <span id="adminEmail">admin@museum.org</span>
+                    <span id="adminEmail"></span>
                 </div>
                 <button class="btn btn-outline" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i>
@@ -284,6 +284,17 @@
             
             <div class="logs-container">
                 <div class="logs-filters">
+                    <select id="logActionFilter" aria-label="Filter by action type">
+                        <option value="">All Actions</option>
+                        <option value="User Login">User Login</option>
+                        <option value="User Logout">User Logout</option>
+                        <option value="Artifact Added">Artifact Added</option>
+                        <option value="Artifact Updated">Artifact Updated</option>
+                        <option value="Artifact Deleted">Artifact Deleted</option>
+                        <option value="User Added">User Added</option>
+                        <option value="User Updated">User Updated</option>
+                        <option value="User Deleted">User Deleted</option>
+                    </select>
                     <button class="btn btn-outline" onclick="loadSystemLogs()">
                         <i class="fas fa-sync-alt"></i>
                         Refresh
@@ -304,6 +315,9 @@
                             <!-- Logs will be loaded here -->
                         </tbody>
                     </table>
+                </div>
+                <div class="pagination-container" id="logsPagination">
+                    <!-- Pagination will be loaded here -->
                 </div>
             </div>
         </section>
@@ -615,21 +629,7 @@
         </div>
     </div>
 
-    <!-- Generic Info Modal -->
-    <div id="genericInfoModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="genericInfoModalTitle">Modal Title</h2>
-                <button class="close-btn" onclick="closeGenericInfoModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p id="genericInfoModalMessage">This is a generic modal message.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeGenericInfoModal()">Close</button>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- Notification Container -->
     <div id="notificationContainer" class="notification-container"></div>

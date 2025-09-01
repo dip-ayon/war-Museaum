@@ -71,9 +71,9 @@ body {
 }
 
 .logo-icon {
-    width: 50px;
-    height: 50px;
-    background: var(--gradient-accent);
+    width: 80px;
+    height: 80px;
+    background: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -337,7 +337,7 @@ body {
 
 .btn-outline {
     background: transparent;
-    color: var(--primary);
+    color: rgb(184, 89, 89);
     border: 2px solid var(--primary);
 }
 
@@ -809,4 +809,28 @@ body {
     .admin-table {
         min-width: 600px;
     }
+}
+.logs-container .pagination-container {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.logs-container .pagination-container a {
+    color: var(--primary);
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
+    margin: 0 4px;
+}
+
+.logs-container .pagination-container a.active {
+    background-color: var(--primary);
+    color: white;
+    border: 1px solid var(--primary);
+}
+
+.logs-container .pagination-container a:hover:not(.active) {
+    background-color: #ddd;
 }

@@ -263,19 +263,19 @@
             position: relative;
         }
         .logo-img {
-            width: 90px;   /* adjust size as needed */
+            width: 50px;   /* adjust size as needed */
             height: auto;
             display: block;
         }
         
         .logo-icon {
             position: relative;
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--gradient-gold);
+            background: white;
             border-radius: 50%;
             box-shadow: var(--box-shadow);
         }
@@ -286,23 +286,6 @@
             z-index: 2;
         }
         
-        .logo-glow {
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-            background: var(--gradient-gold);
-            border-radius: 50%;
-            opacity: 0.3;
-            filter: blur(10px);
-            animation: logoGlow 3s ease-in-out infinite alternate;
-        }
-        
-        @keyframes logoGlow {
-            0% { transform: scale(1); opacity: 0.3; }
-            100% { transform: scale(1.1); opacity: 0.5; }
-        }
         
         .logo-text h1 {
             color: white;
@@ -640,13 +623,13 @@
         
         .section-header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 1rem;
             position: relative;
             z-index: 2;
         }
         
         .section-title {
-            font-size: 3rem;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--primary);
             margin-bottom: 1rem;
@@ -668,7 +651,7 @@
         .search-box {
             background: white;
             border-radius: 20px;
-            padding: 2rem;
+            padding: 3rem;
             box-shadow: var(--box-shadow);
             border: 1px solid rgba(0,0,0,0.05);
         }

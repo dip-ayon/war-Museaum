@@ -64,129 +64,135 @@ function closeEditUserModal() {
 }
 
 function openGenericInfoModal(title, message) {
-    document.getElementById('genericInfoModalTitle').textContent = title;
-    document.getElementById('genericInfoModalMessage').textContent = message;
-    document.getElementById('genericInfoModal').style.display = 'block';
-}
-
-function closeGenericInfoModal() {
-    document.getElementById('genericInfoModal').style.display = 'none';
+    alert(title + ': ' + message);
 }
 
 // Form Submission for Artifact Upload
-document.getElementById('uploadForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+if(document.getElementById('uploadForm')){
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
     
-    const formData = new FormData(this);
-
-    // Client-side validation for image count
-    const imageInput = document.getElementById('artifactImages');
-    if (imageInput.files.length > 5) {
-        openGenericInfoModal('Error', 'You can upload a maximum of 5 images.');
-        return; // Stop the form submission
-    }
-
-    fetch('php/admin_api.php?action=addArtifact', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) {
-            openGenericInfoModal('Success', 'Artifact uploaded successfully!');
-            addLog('Artifact Added', `Artifact with collection number ${formData.get('collection_no')} was added.`);
-            closeUploadModal();
-            loadArtifacts();
-        } else {
-            openGenericInfoModal('Error', data.message);
+        // Client-side validation for image count
+        const imageInput = document.getElementById('artifactImages');
+        if (imageInput.files.length > 5) {
+            alert('Error: You can upload a maximum of 5 images.');
+            return; // Stop the form submission
         }
-    })
-    .catch(error => {
-        console.error('Error uploading artifact:', error);
-        openGenericInfoModal('Error', 'An error occurred while uploading the artifact.');
+    
+        fetch('php/admin_api.php?action=addArtifact', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                alert('Success: Artifact uploaded successfully!');
+                addLog('Artifact Added', `Artifact with collection number ${formData.get('collection_no')} was added.`);
+                closeUploadModal();
+                loadArtifacts();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error uploading artifact:', error);
+            alert('Error: An error occurred while uploading the artifact.');
+        });
     });
-});
+}
+
 
 // Form Submission for Adding User
-document.getElementById('userForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const userData = new FormData(this);
-
-    fetch('php/admin_api.php?action=addUser', {
-        method: 'POST',
-        body: userData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) {
-            openGenericInfoModal('Success', 'User added successfully!');
-            addLog('User Added', `User with email ${userData.get('email')} was added.`);
-            closeUserModal();
-            loadUsers();
-        } else {
-            openGenericInfoModal('Error', data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error adding user:', error);
-        openGenericInfoModal('Error', 'An error occurred while adding the user.');
+if(document.getElementById('userForm')){
+    document.getElementById('userForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+    
+        const userData = new FormData(this);
+    
+        fetch('php/admin_api.php?action=addUser', {
+            method: 'POST',
+            body: userData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                alert('Success: User added successfully!');
+                addLog('User Added', `User with email ${userData.get('email')} was added.`);
+                closeUserModal();
+                loadUsers();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error adding user:', error);
+            alert('Error: An error occurred while adding the user.');
+        });
     });
-});
+}
+
 
 // Form Submission for Editing Artifact
-document.getElementById('editArtifactForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+if(document.getElementById('editArtifactForm')){
+    document.getElementById('editArtifactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
     
-    const formData = new FormData(this);
-
-    fetch('php/admin_api.php?action=updateArtifact', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) {
-            openGenericInfoModal('Success', 'Artifact updated successfully!');
-            addLog('Artifact Updated', `Artifact with ID ${formData.get('id')} was updated.`);
-            closeEditArtifactModal();
-            loadArtifacts();
-        } else {
-            openGenericInfoModal('Error', data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error updating artifact:', error);
-        openGenericInfoModal('Error', 'An error occurred while updating the artifact.');
+        fetch('php/admin_api.php?action=updateArtifact', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                alert('Success: Artifact updated successfully!');
+                addLog('Artifact Updated', `Artifact with ID ${formData.get('id')} was updated.`);
+                closeEditArtifactModal();
+                loadArtifacts();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error updating artifact:', error);
+            alert('Error: An error occurred while updating the artifact.');
+        });
     });
-});
+}
+
 
 // Form Submission for Editing User
-document.getElementById('editUserForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const userData = new FormData(this);
-
-    fetch('php/admin_api.php?action=updateUser', {
-        method: 'POST',
-        body: userData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) {
-            openGenericInfoModal('Success', 'User updated successfully!');
-            addLog('User Updated', `User with ID ${userData.get('id')} was updated.`);
-            closeEditUserModal();
-            loadUsers();
-        } else {
-            openGenericInfoModal('Error', data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error updating user:', error);
-        openGenericInfoModal('Error', 'An error occurred while updating the user.');
+if(document.getElementById('editUserForm')){
+    document.getElementById('editUserForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+    
+        const userData = new FormData(this);
+    
+        fetch('php/admin_api.php?action=updateUser', {
+            method: 'POST',
+            body: userData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                alert('Success: User updated successfully!');
+                addLog('User Updated', `User with ID ${userData.get('id')} was updated.`);
+                closeEditUserModal();
+                loadUsers();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error updating user:', error);
+            alert('Error: An error occurred while updating the user.');
+        });
     });
-});
+}
+
 
 // Helper function to fetch artifacts
 function fetchArtifacts(searchQuery, typeFilter, dateFilter) {
@@ -245,7 +251,7 @@ function loadArtifacts() {
     })
     .catch(error => {
         console.error('Error loading artifacts:', error);
-        openGenericInfoModal('Error', 'An error occurred while loading artifacts.');
+        alert('Error: An error occurred while loading artifacts.');
     });
 }
 
@@ -279,7 +285,7 @@ function loadUsers() {
     })
     .catch(error => {
         console.error('Error loading users:', error);
-        openGenericInfoModal('Error', 'An error occurred while loading users.');
+        alert('Error: An error occurred while loading users.');
     });
 }
 
@@ -289,7 +295,7 @@ function editArtifact(id) {
     .then(response => response.json())
     .then(data => {
         if(data.error) {
-            openGenericInfoModal('Error', data.error);
+            alert('Error: ' + data.error);
             return;
         }
         document.getElementById('editArtifactId').value = data.id;
@@ -310,7 +316,7 @@ function editArtifact(id) {
     })
     .catch(error => {
         console.error('Error fetching artifact data:', error);
-        openGenericInfoModal('Error', 'An error occurred while fetching artifact data.');
+        alert('Error: An error occurred while fetching artifact data.');
     });
 }
 
@@ -320,7 +326,7 @@ function editUser(id) {
     .then(response => response.json())
     .then(data => {
         if(data.error) {
-            openGenericInfoModal('Error', data.error);
+            alert('Error: ' + data.error);
             return;
         }
         document.getElementById('editUserId').value = data.id;
@@ -331,7 +337,7 @@ function editUser(id) {
     })
     .catch(error => {
         console.error('Error fetching user data:', error);
-        openGenericInfoModal('Error', 'An error occurred while fetching user data.');
+        alert('Error: An error occurred while fetching user data.');
     });
 }
 
@@ -348,16 +354,16 @@ function deleteArtifact(id) {
         .then(response => response.json())
         .then(data => {
             if(data.success) {
-                openGenericInfoModal('Success', 'Artifact deleted successfully!');
+                alert('Success: Artifact deleted successfully!');
                 addLog('Artifact Deleted', `Artifact with ID ${id} was deleted.`);
                 loadArtifacts();
             } else {
-                openGenericInfoModal('Error', data.message);
+                alert('Error: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error deleting artifact:', error);
-            openGenericInfoModal('Error', 'An error occurred while deleting the artifact.');
+            alert('Error: An error occurred while deleting the artifact.');
         });
     }
 }
@@ -375,16 +381,16 @@ function deleteUser(id) {
         .then(response => response.json())
         .then(data => {
             if(data.success) {
-                openGenericInfoModal('Success', 'User deleted successfully!');
+                alert('Success: User deleted successfully!');
                 addLog('User Deleted', `User with ID ${id} was deleted.`);
                 loadUsers();
             } else {
-                openGenericInfoModal('Error', data.message);
+                alert('Error: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error deleting user:', error);
-            openGenericInfoModal('Error', 'An error occurred while deleting the user.');
+            alert('Error: An error occurred while deleting the user.');
         });
     }
 }
@@ -445,7 +451,7 @@ function loadReportsTable() {
     })
     .catch(error => {
         console.error('Error loading reports table:', error);
-        openGenericInfoModal('Error', 'An error occurred while loading the reports table.');
+        alert('Error: An error occurred while loading the reports table.');
     });
 }
 
@@ -534,24 +540,6 @@ function downloadReportAsExcel() {
     link.click();
 }
 
-// Event Listeners for Reports Tab
-document.getElementById('reportSearch').addEventListener('keyup', function(event) {
-    if (event.key === 'Enter') {
-        loadReportsTable();
-    }
-});
-
-document.querySelector('#reports .search-btn').addEventListener('click', function() {
-    loadReportsTable();
-});
-
-document.querySelectorAll('#reportsTable thead input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('change', () => {
-        loadReportsTable();
-    });
-});
-
-
 // Artifact Gallery Functions
 let currentImages = [];
 let currentImageIndex = 0;
@@ -597,7 +585,7 @@ function loadArtifactGallery() {
     })
     .catch(error => {
         console.error('Error loading artifact gallery:', error);
-        openGenericInfoModal('Error', 'An error occurred while loading the artifact gallery.');
+        alert('Error: An error occurred while loading the artifact gallery.');
     });
 }
 
@@ -606,7 +594,7 @@ function openArtifactDetailsModal(id) {
     .then(response => response.json())
     .then(data => {
         if(data.error) {
-            openGenericInfoModal('Error', data.error);
+            alert('Error: ' + data.error);
             return;
         }
         document.getElementById('detailObjectHead').textContent = data.object_head;
@@ -632,7 +620,7 @@ function openArtifactDetailsModal(id) {
     })
     .catch(error => {
         console.error('Error fetching artifact details:', error);
-        openGenericInfoModal('Error', 'An error occurred while fetching artifact details.');
+        alert('Error: An error occurred while fetching artifact details.');
     });
 }
 
@@ -652,14 +640,15 @@ function updateImageViewer() {
 }
 
 // Load System Logs and Populate Table
-function loadSystemLogs() {
+function loadSystemLogs(page = 1) {
     const tableBody = document.getElementById('logsTableBody');
+    const logActionFilter = document.getElementById('logActionFilter').value;
     if (!tableBody) {
         console.error('logsTableBody not found');
         return;
     }
 
-    fetch('php/admin_api.php?action=getSystemLogs')
+    fetch(`php/admin_api.php?action=getSystemLogs&page=${page}&filter=${logActionFilter}`)
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -672,7 +661,7 @@ function loadSystemLogs() {
         }
         tableBody.innerHTML = ''; // Clear existing rows
 
-        data.forEach(log => {
+        data.logs.forEach(log => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${log.created_at}</td>
@@ -682,11 +671,32 @@ function loadSystemLogs() {
             `;
             tableBody.appendChild(row);
         });
+
+        renderLogsPagination(data.totalPages, page);
     })
     .catch(error => {
         console.error('Error loading system logs:', error);
         tableBody.innerHTML = `<tr><td colspan="4">Error loading system logs: ${error.message}</td></tr>`;
     });
+}
+
+function renderLogsPagination(totalPages, currentPage) {
+    const paginationContainer = document.getElementById('logsPagination');
+    paginationContainer.innerHTML = '';
+
+    for (let i = 1; i <= totalPages; i++) {
+        const pageLink = document.createElement('a');
+        pageLink.href = '#';
+        pageLink.innerText = i;
+        if (i === currentPage) {
+            pageLink.classList.add('active');
+        }
+        pageLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadSystemLogs(i);
+        });
+        paginationContainer.appendChild(pageLink);
+    }
 }
 
 function addLog(action, details) {
@@ -711,6 +721,18 @@ function addLog(action, details) {
 
 // Update Dashboard Statistics
 function updateDashboardStats() {
+    fetch('php/admin_api.php?action=getDashboardStats')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('totalViews').textContent = data.stats.total_views;
+                document.getElementById('recentUploads').textContent = data.stats.total_photos;
+            } else {
+                console.error('Error fetching dashboard stats:', data.message);
+            }
+        })
+        .catch(error => console.error('Error fetching dashboard stats:', error));
+
     // Fetch total artifacts
     fetch('php/admin_api.php?action=getArtifacts')
     .then(response => response.json())
@@ -734,7 +756,7 @@ function updateDashboardStats() {
         const recentActivityDiv = document.getElementById('recentActivity');
         recentActivityDiv.innerHTML = '';
         // Display up to 5 recent activities
-        data.slice(0, 5).forEach(log => {
+        data.logs.slice(0, 5).forEach(log => {
             const activityItem = document.createElement('div');
             activityItem.classList.add('activity-item');
             activityItem.innerHTML = `
@@ -749,76 +771,101 @@ function updateDashboardStats() {
 
 // Initial data load when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    updateDashboardStats();
-    loadUsers();
-    loadSystemLogs();
+    const adminName = localStorage.getItem('adminName');
+    const adminEmail = localStorage.getItem('adminEmail');
 
-    // Event Listeners for Reports Tab
-    document.getElementById('reportSearch').addEventListener('keyup', function(event) {
-        if (event.key === 'Enter') {
-            loadReportsTable();
-        }
-    });
+    if (adminName && adminEmail) {
+        document.getElementById('adminName').textContent = adminName;
+        document.getElementById('adminEmail').textContent = adminEmail;
+    }
 
-    document.querySelector('#reports .search-btn').addEventListener('click', function() {
-        loadReportsTable();
-    });
+    if(document.getElementById('logActionFilter')){
+        document.getElementById('logActionFilter').addEventListener('change', () => loadSystemLogs());
+    }
 
-    document.querySelectorAll('#reportsTable thead input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', () => {
+    if(window.location.pathname.includes("admin.html")){
+        updateDashboardStats();
+        loadUsers();
+        loadSystemLogs();
+    
+        // Event Listeners for Artifact Search
+        document.getElementById('artifactSearch').addEventListener('keyup', loadArtifacts);
+        document.querySelector('#artifacts .search-btn').addEventListener('click', loadArtifacts);
+        document.getElementById('typeFilter').addEventListener('change', loadArtifacts);
+        document.getElementById('dateFilter').addEventListener('change', loadArtifacts);
+    
+        // Event Listeners for Reports Tab
+        document.getElementById('reportSearch').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                loadReportsTable();
+            }
+        });
+    
+        document.querySelector('#reports .search-btn').addEventListener('click', function() {
             loadReportsTable();
         });
-    });
-
-    document.getElementById('prevImage').addEventListener('click', () => {
-        if (currentImages.length > 1) {
-            currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+    
+        document.querySelectorAll('#reportsTable thead input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                loadReportsTable();
+            });
+        });
+    
+        document.getElementById('prevImage').addEventListener('click', () => {
+            if (currentImages.length > 1) {
+                currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+                updateImageViewer();
+            }
+        });
+    
+        document.getElementById('nextImage').addEventListener('click', () => {
+            if (currentImages.length > 1) {
+                currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+                updateImageViewer();
+            }
+        });
+    
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            currentZoomLevel = Math.min(currentZoomLevel + 0.1, 3); // Max zoom 3x
             updateImageViewer();
-        }
-    });
-
-    document.getElementById('nextImage').addEventListener('click', () => {
-        if (currentImages.length > 1) {
-            currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+        });
+    
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            currentZoomLevel = Math.max(currentZoomLevel - 0.1, 0.5); // Min zoom 0.5x
             updateImageViewer();
-        }
-    });
-
-    document.getElementById('zoomIn').addEventListener('click', () => {
-        currentZoomLevel = Math.min(currentZoomLevel + 0.1, 3); // Max zoom 3x
-        updateImageViewer();
-    });
-
-    document.getElementById('zoomOut').addEventListener('click', () => {
-        currentZoomLevel = Math.max(currentZoomLevel - 0.1, 0.5); // Min zoom 0.5x
-        updateImageViewer();
-    });
-
-    // Event Listeners for Artifact Gallery Filters and Search
-    document.getElementById('galleryArtifactSearch').addEventListener('keyup', function(event) {
-        if (event.key === 'Enter') {
+        });
+    
+        // Event Listeners for Artifact Gallery Filters and Search
+        document.getElementById('galleryArtifactSearch').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                loadArtifactGallery();
+            }
+        });
+    
+        document.querySelector('#artifactGallery .search-btn').addEventListener('click', function() {
             loadArtifactGallery();
-        }
-    });
-
-    document.querySelector('#artifactGallery .search-btn').addEventListener('click', function() {
-        loadArtifactGallery();
-    });
-
-    document.getElementById('galleryTypeFilter').addEventListener('change', loadArtifactGallery);
-    document.getElementById('galleryDateFilter').addEventListener('change', loadArtifactGallery);
-
-    // Event Listeners for Artifact Filters and Search (existing)
-    document.getElementById('artifactSearch').addEventListener('keyup', function(event) {
-        if (event.key === 'Enter') {
-            loadArtifacts();
-        }
-    });
-
-    document.querySelector('#artifacts .search-btn').addEventListener('click', function() {
-        loadArtifacts();
-    });
-
-    document.getElementById('typeFilter').addEventListener('change', loadArtifacts);
-    document.getElementById('dateFilter').addEventListener('change', loadArtifacts);
+        });
+    
+        document.getElementById('galleryTypeFilter').addEventListener('change', loadArtifactGallery);
+        document.getElementById('galleryDateFilter').addEventListener('change', loadArtifactGallery);
+    }
 });
+
+// Logout function
+function logout() {
+    fetch('php/admin_api.php?action=logout', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = 'index.html'; // Redirect to login page
+        } else {
+            alert('Error: ' + (data.message || 'Failed to logout.'));
+        }
+    })
+    .catch(error => {
+        console.error('Error during logout:', error);
+        alert('Error: An error occurred during logout.');
+    });
+}

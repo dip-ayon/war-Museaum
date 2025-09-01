@@ -30,6 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pagination element
     const paginationContainer = document.getElementById('pagination-container');
 
+    // Profile Settings Form
+    const profileSettingsForm = document.getElementById('profileSettingsForm');
+    const changePasswordForm = document.getElementById('changePasswordForm');
+
     // Function to show a specific tab
     const showTab = (tabToShow, activeTabLink) => {
         console.log('Showing tab:', tabToShow.id);
@@ -67,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             console.log('Profile Settings tab clicked.');
             showTab(profileSettingsSection, profileSettingsTab);
+            loadUserProfile();
         });
     }
 
@@ -370,6 +375,89 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Load user profile
+    function loadUserProfile() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+            document.getElementById('userName').value = user.name;
+            document.getElementById('userEmail').value = user.email;
+        }
+    }
+
+    // Handle profile settings form submission
+    if (profileSettingsForm) {
+        profileSettingsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = JSON.parse(localStorage.getItem('user'));
+            const updatedUser = {
+                id: user.id,
+                name: document.getElementById('userName').value,
+                email: document.getElementById('userEmail').value
+            };
+
+            try {
+                const response = await fetch('php/admin_api.php?action=updateVisitorProfile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedUser)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Profile updated successfully');
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('adminName', data.user.name);
+                } else {
+                    alert('Error updating profile: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('An error occurred while updating your profile.');
+            }
+        });
+    }
+
+    // Handle change password form submission
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = JSON.parse(localStorage.getItem('user'));
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match.');
+                return;
+            }
+
+            try {
+                const response = await fetch('php/admin_api.php?action=changeVisitorPassword', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        id: user.id,
+                        currentPassword: currentPassword,
+                        newPassword: newPassword
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Password changed successfully');
+                    changePasswordForm.reset();
+                } else {
+                    alert('Error changing password: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error changing password:', error);
+                alert('An error occurred while changing your password.');
+            }
+        });
+    }
+
     // Initial load: show artifact gallery and load artifacts
     // Ensure elements exist before trying to show them
     if (artifactGallerySection && artifactGalleryTab) {
@@ -399,3 +487,26 @@ function addLog(action, details) {
         console.error('Error adding log:', error);
     });
 }
+
+let slideIndex = 0;
+showSlides();
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function showSlides() {
+  let i;
+  let slides = document.getElementsByClassName("mySlides");
+  if (slides.length === 0) return;
+  if (slideIndex >= slides.length) {slideIndex = 0}
+  if (slideIndex < 0) {slideIndex = slides.length - 1}
+  for (i = 0; i < slides.length; i++) {
+    slides[i].style.display = "none";
+  }
+  slides[slideIndex].style.display = "block";
+  slideIndex++;
+  setTimeout(showSlides, 2000); // Change image every 2 seconds
+}
+
+window.plusSlides = plusSlides;

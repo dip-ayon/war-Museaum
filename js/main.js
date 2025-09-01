@@ -124,7 +124,7 @@ function renderSlideshow() {
     slideshowImages.forEach((image, index) => {
         const slideDiv = document.createElement('div');
         slideDiv.classList.add('slides', 'fade');
-        if (index === 0) slideDiv.classList.add('active');
+        if (index === 0) slideDiv.style.display = 'block';
         slideDiv.setAttribute('data-aos', 'zoom-in');
 
         slideDiv.innerHTML = `
@@ -154,10 +154,51 @@ function renderSlideshow() {
         const indicatorSpan = document.createElement('span');
         indicatorSpan.classList.add('indicator');
         if (index === 0) indicatorSpan.classList.add('active');
-        indicatorSpan.setAttribute('onclick', `currentSlide(${index + 1})`);
+        indicatorSpan.setAttribute('onclick', `currentSlide(${index})`);
         slideIndicatorsContainer.appendChild(indicatorSpan);
     });
+
+    setupSlideshow();
 }
+
+function setupSlideshow() {
+    let slideIndex = 0;
+    showSlides();
+
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+
+    function currentSlide(n) {
+        showSlides(slideIndex = n);
+    }
+
+    function showSlides() {
+        let i;
+        let slides = document.getElementsByClassName("slides");
+        let dots = document.getElementsByClassName("indicator");
+        if (slideIndex >= slides.length) {slideIndex = 0}
+        if (slideIndex < 0) {slideIndex = slides.length - 1}
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+        for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" active", "");
+        }
+        slides[slideIndex].style.display = "block";
+        dots[slideIndex].className += " active";
+    }
+
+    // Make plusSlides and currentSlide globally accessible for the onclick attributes
+    window.plusSlides = plusSlides;
+    window.currentSlide = currentSlide;
+
+    // Automatic slideshow
+    setInterval(() => {
+        plusSlides(1);
+    }, 5000);
+}
+
 
 function startSlideshow() {
     const slides = document.querySelectorAll('.slides');
@@ -295,6 +336,8 @@ async function loginUser(credentials) {
         if (data.success) {
             localStorage.setItem('authToken', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('adminName', data.user.name);
+            localStorage.setItem('adminEmail', data.user.email);
             currentUser = data.user;
 
             updateAuthButtons();

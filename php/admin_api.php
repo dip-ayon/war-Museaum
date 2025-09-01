@@ -49,9 +49,38 @@ switch ($action) {
     case 'add_log':
         add_log($conn);
         break;
+    case 'logout':
+        logout();
+        break;
+    case 'getDashboardStats':
+        getDashboardStats($conn);
+        break;
     default:
         echo json_encode(['success' => false, 'message' => 'Invalid action']);
         break;
+}
+
+function getDashboardStats($conn) {
+    $stats = [];
+
+    // Total views
+    $sql_views = "SELECT COUNT(*) as total_views FROM system_logs WHERE action = 'View Artifact'";
+    $result_views = $conn->query($sql_views);
+    $stats['total_views'] = $result_views->fetch_assoc()['total_views'];
+
+    // Total photo uploads
+    $sql_photos = "SELECT COUNT(*) as total_photos FROM artifact_images";
+    $result_photos = $conn->query($sql_photos);
+    $stats['total_photos'] = $result_photos->fetch_assoc()['total_photos'];
+
+    echo json_encode(['success' => true, 'stats' => $stats]);
+}
+
+function logout() {
+    session_start();
+    session_unset();
+    session_destroy();
+    echo json_encode(['success' => true, 'message' => 'Logged out successfully.']);
 }
 
 function registerUser($conn) {
@@ -320,7 +349,7 @@ function getArtifacts($conn) {
             $artifacts[] = $row;
         }
     }
-    echo json_encode($artifacts);
+    echo json_encode($artifacts); 
     $stmt->close();
 }
 
@@ -334,19 +363,61 @@ function getUsers($conn) {
             $users[] = $row;
         }
     }
-    echo json_encode($users);
+  echo json_encode($users);  
 }
 
 function getSystemLogs($conn) {
-    $sql = "SELECT sl.id, u.name as user_name, sl.action, sl.details, sl.created_at FROM system_logs sl LEFT JOIN users u ON sl.user_id = u.id ORDER BY sl.created_at DESC";
-    $result = $conn->query($sql);
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
+    $limit = 10; // Logs per page
+    $offset = ($page - 1) * $limit;
+
+    $where_clauses = [];
+    $params = [];
+    $param_types = "";
+
+    if (!empty($filter)) {
+        $where_clauses[] = "sl.action = ?";
+        $params[] = $filter;
+        $param_types .= "s";
+    }
+
+    $count_sql = "SELECT COUNT(*) as total FROM system_logs sl";
+    if (!empty($where_clauses)) {
+        $count_sql .= " WHERE " . implode(" AND ", $where_clauses);
+    }
+
+    $stmt_count = $conn->prepare($count_sql);
+    if (!empty($params)) {
+        $stmt_count->bind_param($param_types, ...$params);
+    }
+    $stmt_count->execute();
+    $result_count = $stmt_count->get_result();
+    $total_logs = $result_count->fetch_assoc()['total'];
+    $total_pages = ceil($total_logs / $limit);
+
+    $sql = "SELECT sl.id, u.name as user_name, sl.action, sl.details, sl.created_at FROM system_logs sl LEFT JOIN users u ON sl.user_id = u.id";
+    if (!empty($where_clauses)) {
+        $sql .= " WHERE " . implode(" AND ", $where_clauses);
+    }
+    $sql .= " ORDER BY sl.created_at DESC LIMIT ? OFFSET ?";
+
+    $stmt = $conn->prepare($sql);
+    $param_types .= 'ii';
+    $params[] = $limit;
+    $params[] = $offset;
+    if (!empty($params)) {
+        $stmt->bind_param($param_types, ...$params);
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     $logs = [];
     if ($result) {
         while ($row = $result->fetch_assoc()) {
             $logs[] = $row;
         }
-        echo json_encode($logs);
+        echo json_encode(['logs' => $logs, 'totalPages' => $total_pages]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Failed to fetch logs']);
     }
